@@ -7,9 +7,44 @@
 
 -> Write an introduction.
 
-## Getting Started
+## Use case
 
--> Write some instructions along with examples for how to use this library.
+```rust
+use mabe::Mabe;
+
+#[derive(Debug, Mabe)]
+pub enum ServerError {
+    #[error("You are not authorized to access this resource.")]
+    #[solution("Try using a different account.")]
+    Unauthorized,
+
+    #[error("Network failure.")]
+    #[reason("Code {0}: {1}.")]
+    NetworkFailure(u32, String),
+
+    #[error("Connection lost.")]
+    #[reason("{reason}")]
+    #[solution("Retry in {retry_in} seconds.")]
+    ConnectionLost { reason: String, retry_in: u32 }
+}
+```
+
+## Details
+
+If you try to use a field that does not exist in the variant, an error will be thrown:
+
+```rust
+use mabe::Mabe;
+
+#[derive(Debug, Mabe)]
+pub enum ServerError {
+    #[error("You are not authorized to access this resource.")]
+    #[solution("Try using a different account.")]
+    Unauthorized,
+}
+```
+
+If you ...
 
 ## Contributing
 

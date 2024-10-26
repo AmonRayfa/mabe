@@ -1,11 +1,11 @@
 # Build
-/bin
-/build
-/dist
-/dist-ssr
-/lib
-/lib-types
-/server
+bin
+build
+dist
+dist-ssr
+lib
+lib-types
+server
 
 # Cache
 .cache
@@ -13,12 +13,30 @@
 .rollup.cache
 tsconfig.tsbuildinfo
 
+# Cargo
+# For some unknown reason, cargo will include them in the package when publishing to crates.io if they are not ignored.
+.trunk/*actions
+.trunk/*actions/**
+.trunk/*logs
+.trunk/*logs/**
+.trunk/*notifications
+.trunk/*notifications/**
+.trunk/*out
+.trunk/*out/**
+.trunk/*tools
+.trunk/*tools/**
+.trunk/plugins
+.trunk/plugins/**
+.trunk/user_trunk.yaml
+.trunk/user.yaml
+node_modules/**
+
 # Development
 *.local
 .env
-/node_modules
-/target
-/tmp
+node_modules
+target
+tmp
 
 # Editors
 *.njsproj

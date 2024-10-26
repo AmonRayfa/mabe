@@ -1,6 +1,6 @@
 [package]
 name = "mabe"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Amon Rayfa <amon.rayfa@proton.me>"]
 homepage = "https://github.com/AmonRayfa/mabe"
 license = "Apache-2.0"

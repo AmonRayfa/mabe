@@ -1,0 +1,35 @@
+[package]
+name = "mabe"
+version = "0.1.1"
+authors = ["Amon Rayfa <amon.rayfa@proton.me>"]
+homepage = "https://github.com/AmonRayfa/mabe"
+license = "Apache-2.0"
+description = "A Rust library for creating simple and coherently structured runtime errors."
+keywords = ["debugging", "error", "coherent", "simple", "structured"]
+categories = ["development-tools::debugging"]
+repository = "https://github.com/AmonRayfa/mabe"
+readme = "../README.md"
+edition = "2021"
+include = [
+  "Cargo.lock",
+  "Cargo.toml",
+  "src/**",
+  "../LICENSE",
+  "../README.md",
+  "../translations/**",
+]
+publish = true
+
+[profile.dev]
+opt-level = 0
+
+[profile.release]
+opt-level = 3
+
+[lib]
+proc-macro = true
+
+[dependencies]
+colored = "2"
+quote = "1"
+syn = "1"

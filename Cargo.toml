@@ -1,6 +1,6 @@
 [package]
 name = "mabe"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Amon Rayfa <amon.rayfa@proton.me>"]
 homepage = "https://github.com/AmonRayfa/mabe"
 license = "Apache-2.0"
@@ -10,13 +10,15 @@ categories = ["development-tools::debugging"]
 repository = "https://github.com/AmonRayfa/mabe"
 readme = "README.md"
 edition = "2021"
-include = [
-  "Cargo.lock",
-  "Cargo.toml",
-  "LICENSE",
-  "README.md",
-  "src/**",
+exclude = [
+  "node_modules/**",
+  "package.json",
+  "pnpm-lock.yaml",
+  "target/**",
   "translations/**",
+  ".gitignore",
+  ".trunk/**",
+  ".vscode/**",
 ]
 publish = true
 

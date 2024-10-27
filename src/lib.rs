@@ -7,7 +7,7 @@
 //!
 
 extern crate proc_macro;
-use proc_macro::TokenStream;
+use proc_macro::{Span, TokenStream};
 use quote::quote;
 use syn::{parse_macro_input, Data, DeriveInput, Lit, Meta, NestedMeta};
 
@@ -19,9 +19,10 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let enum_ident = &input.ident;
 
-    let mut error_match_arms = Vec::new();
-    let mut reason_match_arms = Vec::new();
-    let mut solution_match_arms = Vec::new();
+    let mut variant_idents = Vec::new();
+    let mut error_msgs = Vec::new();
+    let mut reason_msgs = Vec::new();
+    let mut solution_msgs = Vec::new();
 
     if let Data::Enum(enum_data) = &input.data {
         // Iterates over all the variants of the enum to generate the appropriate match arms for each of them.
@@ -74,38 +75,45 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
                 }
             }
 
-            // Generates match arms for each variant.
-            error_match_arms.push(quote! {
-                Self::#variant_ident => #error_msg,
-            });
-            reason_match_arms.push(quote! {
-                Self::#variant_ident => #reason_msg,
-            });
-            solution_match_arms.push(quote! {
-                Self::#variant_ident => #solution_msg,
-            });
+            variant_idents.push(variant_ident);
+            error_msgs.push(error_msg);
+            reason_msgs.push(reason_msg);
+            solution_msgs.push(solution_msg);
         }
-
-        // Generates a default match arm in case the enum has no variants.
-        error_match_arms.push(quote! { _ => String::new() });
-        reason_match_arms.push(quote! { _ => String::new() });
-        solution_match_arms.push(quote! { _ => String::new() });
     } else {
         panic!("The `Mabe` derive macro can only be used with enums.");
     }
 
     TokenStream::from(quote! {
         impl #enum_ident {
-            fn error(&self) -> String { match self { #(#error_match_arms),* } }
+            pub fn error(&self) -> &str {
+                match self {
+                    #(
+                        #enum_ident::#variant_idents => #error_msgs,
+                    )*
+                }
+            }
 
-            fn reason(&self) -> String { match self { #(#reason_match_arms),* } }
+            pub fn reason(&self) -> &str {
+                match self {
+                    #(
+                        #enum_ident::#variant_idents => #reason_msgs,
+                    )*
+                }
+            }
 
-            fn solution(&self) -> String { match self { #(#solution_match_arms),* } }
+            pub fn solution(&self) -> &str {
+                match self {
+                    #(
+                        #enum_ident::#variant_idents => #solution_msgs,
+                    )*
+                }
+            }
         }
 
         impl std::fmt::Display for #enum_ident {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                write!(f, "[error] {}\n[reason] {}\n[solution] {}", self.error(), self.reason(), self.solution())
+                write!(f, "[error] {}\n[reason] {}\n[solution] {}", "self.error()", "self.reason()", "self.solution()")
             }
         }
 

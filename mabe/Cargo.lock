@@ -23,9 +23,14 @@ name = "mabe"
 version = "0.1.2"
 dependencies = [
  "colored",
+ "mabe_utils",
  "quote",
  "syn",
 ]
+
+[[package]]
+name = "mabe_utils"
+version = "0.1.0"
 
 [[package]]
 name = "proc-macro2"

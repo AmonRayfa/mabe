@@ -10,16 +10,7 @@ categories = ["development-tools::debugging"]
 repository = "https://github.com/AmonRayfa/mabe"
 readme = "README.md"
 edition = "2021"
-exclude = [
-  "node_modules/**",
-  "package.json",
-  "pnpm-lock.yaml",
-  "target/**",
-  "translations/**",
-  ".gitignore",
-  ".trunk/**",
-  ".vscode/**",
-]
+exclude = ["target/**"]
 publish = true
 
 [profile]
@@ -30,9 +21,16 @@ release = { opt-level = 3 }
 proc-macro = true
 
 [[test]]
-name = "simple_cases"
+name = "unit_variants"
+
+[[test]]
+name = "tuple_variants"
+
+[[test]]
+name = "struct_variants"
 
 [dependencies]
 colored = "2"
+mabe_utils = { path = "../mabe_utils" }
 quote = "1"
 syn = "1"

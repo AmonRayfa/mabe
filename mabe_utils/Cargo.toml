@@ -1,0 +1,18 @@
+[package]
+name = "mabe_utils"
+version = "0.1.0"
+authors = ["Amon Rayfa <amon.rayfa@proton.me>"]
+homepage = "https://github.com/AmonRayfa/mabe"
+license = "Apache-2.0"
+description = "A Rust library that provides utilities for the mabe library."
+keywords = ["debugging", "error", "coherent", "simple", "structured"]
+categories = ["development-tools::debugging"]
+repository = "https://github.com/AmonRayfa/mabe"
+readme = "README.md"
+edition = "2021"
+exclude = ["target/**"]
+publish = true
+
+[profile]
+dev = { opt-level = 0 }
+release = { opt-level = 3 }

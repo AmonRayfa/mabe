@@ -3,13 +3,14 @@
 
 /// Returns the index of the first active left curly brace i.e. a single left curly brace or a left curly brace that is part of
 /// a sequence of consecutive left curly braces with an odd number of braces.
-pub fn active_left_brace(msg: &String, checkpoint: usize) -> Option<usize> {
+pub fn find_active_left_brace<M: ToString>(msg: M, start: usize) -> Option<usize> {
+    let msg = msg.to_string();
     let mut consec_left_braces = 0;
 
-    match msg[checkpoint..].find('{') {
+    match msg[start..].find('{') {
         Some(mut i) => {
             consec_left_braces += 1;
-            i += checkpoint;
+            i += start;
             while i < msg.len() - 1 && msg.chars().nth(i + 1).unwrap() == '{' {
                 consec_left_braces += 1;
                 i += 1;
@@ -18,7 +19,7 @@ pub fn active_left_brace(msg: &String, checkpoint: usize) -> Option<usize> {
             if consec_left_braces % 2 != 0 {
                 Some(i)
             } else {
-                active_left_brace(msg, i + 1)
+                find_active_left_brace(msg, i + 1)
             }
         }
         None => None,
@@ -27,13 +28,14 @@ pub fn active_left_brace(msg: &String, checkpoint: usize) -> Option<usize> {
 
 /// Returns the index of the first active right curly brace i.e. a single right curly brace or a right curly brace that is part
 /// of a sequence of consecutive right curly braces with an odd number of braces.
-pub fn active_right_brace(msg: &String, checkpoint: usize) -> Option<usize> {
+pub fn find_active_right_brace<M: ToString>(msg: M, start: usize) -> Option<usize> {
+    let msg = msg.to_string();
     let mut consec_right_braces = 0;
 
-    match msg[checkpoint..].find('}') {
+    match msg[start..].find('}') {
         Some(mut i) => {
             consec_right_braces += 1;
-            i += checkpoint;
+            i += start;
             let index = i;
             while i < msg.len() - 1 && msg.chars().nth(i + 1).unwrap() == '}' {
                 consec_right_braces += 1;
@@ -43,15 +45,15 @@ pub fn active_right_brace(msg: &String, checkpoint: usize) -> Option<usize> {
             if consec_right_braces % 2 != 0 {
                 Some(index)
             } else {
-                active_right_brace(msg, i + 1)
+                find_active_right_brace(msg, i + 1)
             }
         }
         None => None,
     }
 }
 
-/// Returns the index of the first string in a vector that is equal to the target string.
+/// Returns the index of the first element that matches the target in a vector.
 /// If no such string is found, `None` is returned.
-pub fn find_index(vec: &[String], target: &String) -> Option<usize> {
-    vec.iter().position(|s| s == target)
+pub fn find_target<T: ToString, E: ToString>(target: T, vec: &[E]) -> Option<usize> {
+    vec.iter().position(|e| e.to_string() == target.to_string())
 }

@@ -7,11 +7,11 @@
 //!
 
 extern crate proc_macro;
-mod tools;
+mod utils;
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{parse_macro_input, Data, DeriveInput, Fields, Lit, Meta, NestedMeta};
-use tools::*;
+use utils::*;
 
 /// Procedural macro that generates code for enums annotated with the `Mabe` derive macro.
 /// This macro processes the input enum and generates methods to retrieve error, reason, and solution messages for each variant
@@ -111,9 +111,10 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
             // Generates the match arms for the variant based on the type of fields it contains.
             match &variant.fields {
                 Fields::Unit => {
-                    let (_, error_keyword_args) = pattern_map(&error_args, &[], true);
-                    let (_, reason_keyword_args) = pattern_map(&reason_args, &[], true);
-                    let (_, solution_keyword_args) = pattern_map(&solution_args, &[], true);
+                    let fields = Vec::<String>::new();
+                    let (_, error_keyword_args) = pattern_map(&error_args, &fields, true);
+                    let (_, reason_keyword_args) = pattern_map(&reason_args, &fields, true);
+                    let (_, solution_keyword_args) = pattern_map(&solution_args, &fields, true);
 
                     error_match_arms.push(quote! {
                         Self::#variant_ident => format!(#error_msg, #(#error_keyword_args),*),
@@ -122,18 +123,18 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
                         Self::#variant_ident => format!(#reason_msg, #(#reason_keyword_args),*),
                     });
                     solution_match_arms.push(quote! {
-                        Self::#variant_ident => format!(#solution_msg, #(#solution_keyword_args),*),
+                        Self::#variant_ident  => format!(#solution_msg, #(#solution_keyword_args),*),
                     });
                 }
                 Fields::Unnamed(fields) => {
-                    let fields = (0..fields.unnamed.iter().len()).map(|i| i.to_string()).collect::<Vec<_>>();
+                    let fields = (0..fields.unnamed.iter().len()).map(|i| i.to_string()).collect::<Vec<String>>();
 
                     for f in fields.iter() {
                         if !error_args.contains(f) && !reason_args.contains(f) && !solution_args.contains(f) {
                             panic!(
-                                "The `{}` field of the `{}` variant is not used in the error, reason, or solution message. Make sure to include it in at least one of the messages.",
-                                f, variant_ident
-                            );
+                            "The `{}` field of the `{}` variant is not used in the error, reason, or solution message. Make sure to include it in at least one of the messages.",
+                            f, variant_ident
+                        );
                         }
                     }
 
@@ -153,21 +154,21 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
                 }
                 Fields::Named(fields) => {
                     let fields = fields.named
-                        .iter()
-                        .map(|f| {
-                            f.ident
-                                .clone()
-                                .unwrap_or_else(|| panic!("Failed to retrieve the identifier of a named field in the `{}` variant. This error should not be possible, try reloading the window. If the problem persists, report it to the crate's [GitHub repository](https://github.com/AmonRayfa/mabe).", variant_ident))
-                                .to_string()
-                        })
-                        .collect::<Vec<_>>();
+                    .iter()
+                    .map(|f| {
+                        f.ident
+                            .clone()
+                            .unwrap_or_else(|| panic!("Failed to retrieve the identifier of a named field in the `{}` variant. This error should not be possible, try reloading the window. If the problem persists, report the issue to the crate's [GitHub repository](https://github.com/AmonRayfa/mabe).", variant_ident))
+                            .to_string()
+                    })
+                    .collect::<Vec<String>>();
 
                     for f in fields.iter() {
                         if !error_args.contains(f) && !reason_args.contains(f) && !solution_args.contains(f) {
                             panic!(
-                                "The `{}` field of the `{}` variant is not used in the error, reason, or solution message. Make sure to include it in at least one of the messages.",
-                                f, variant_ident
-                            );
+                            "The `{}` field of the `{}` variant is not used in the error, reason, or solution message. Make sure to include it in at least one of the messages.",
+                            f, variant_ident
+                        );
                         }
                     }
 
@@ -208,6 +209,9 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
 
         impl std::error::Error for #enum_ident {}
     };
+
+    #[cfg(debug_assertions)]
+    write_implementations(&implementations, "./logs/generated_implementations.txt");
 
     TokenStream::from(implementations)
 }

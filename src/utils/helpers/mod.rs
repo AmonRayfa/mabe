@@ -1,25 +1,27 @@
 // Copyright 2024 Amon Rayfa.
 // SPDX-License-Identifier: Apache-2.0.
 
-mod helpers;
-use helpers::*;
+mod finders;
+use finders::*;
 use proc_macro2::{Span, TokenStream};
 use quote::quote;
 use syn::Ident;
 
-/// A tool that returns a tuple containing the formatted message and the extracted arguments.
+/// A tool that returns a tuple containing the formatted message and the extracted arguments
+/// as `String` and `Vec<String>` types respectively.
 /// In the formatted message, all single curly braces (i.e. curly braces that are not part of a placeholder),
-/// and all placeholders are replaced with generic placeholders (e.g. {placeholder0}, {placeholder1}, etc.).
+/// and all placeholders are replaced with generic placeholders (e.g. `{placeholder0}`, `{placeholder1}`, etc.).
 /// The replaced elements are stored in the extracted arguments vector.
-pub fn generic_format(msg: String) -> (String, Vec<String>) {
+pub fn generic_format<M: ToString>(msg: M) -> (String, Vec<String>) {
+    let msg = msg.to_string();
     let mut formatted_msg = String::new();
-    let mut extracted_args = Vec::new();
+    let mut extracted_args = Vec::<String>::new();
     let mut placeholder_position = 0;
     let mut checkpoint = 0;
 
     while checkpoint < msg.len() {
-        let index_left_brace = active_left_brace(&msg, checkpoint);
-        let index_right_brace = active_right_brace(&msg, checkpoint);
+        let index_left_brace = find_active_left_brace(&msg, checkpoint);
+        let index_right_brace = find_active_right_brace(&msg, checkpoint);
         let generic_placeholder = format!("{{placeholder{}}}", placeholder_position);
 
         if index_left_brace.is_some() && index_right_brace.is_some() {
@@ -49,16 +51,21 @@ pub fn generic_format(msg: String) -> (String, Vec<String>) {
     (formatted_msg, extracted_args)
 }
 
-/// A tool that returns a tuple containing the pattern bindings and the keyword arguments.
+/// A tool that returns a tuple containing the pattern bindings and the keyword arguments
+/// as `Vec<[TokenStream](proc_macro2::TokenStream)>` types.
 /// The pattern bindings are the fields of an enum variant and the keyword arguments are the placeholders and the extracted
 /// arguments.
-pub fn pattern_map(args: &[String], fields: &[String], dunder: bool) -> (Vec<TokenStream>, Vec<TokenStream>) {
+/// The `dunder` parameter is a boolean that determines whether the pattern bindings should have underscores at the beginning and end.
+pub fn pattern_map<A: ToString, F: ToString>(args: &[A], fields: &[F], dunder: bool) -> (Vec<TokenStream>, Vec<TokenStream>) {
+    let args = args.iter().map(|a| a.to_string()).collect::<Vec<String>>();
+    let fields = fields.iter().map(|f| f.to_string()).collect::<Vec<String>>();
+
     let pattern_bindings = fields
         .iter()
         .map(|f| {
             let pattern = match dunder {
                 true => Ident::new(format!("_{}_", f).as_str(), Span::call_site()),
-                false => Ident::new(f.to_string().as_str(), Span::call_site()),
+                false => Ident::new(f.as_str(), Span::call_site()),
             };
             quote! { #pattern }
         })
@@ -69,7 +76,7 @@ pub fn pattern_map(args: &[String], fields: &[String], dunder: bool) -> (Vec<Tok
         .enumerate()
         .map(|(i, arg)| {
             let keyword = Ident::new(format!("placeholder{}", i).as_str(), Span::call_site());
-            match find_index(fields, arg) {
+            match find_target(arg, &fields) {
                 Some(index) => {
                     let pattern = &pattern_bindings[index];
                     quote! { #keyword = #pattern }

@@ -7,10 +7,11 @@
 //!
 
 extern crate proc_macro;
-use mabe_utils::generic_format;
-use proc_macro::{Span, TokenStream};
+mod tools;
+use proc_macro::TokenStream;
 use quote::quote;
 use syn::{parse_macro_input, Data, DeriveInput, Fields, Lit, Meta, NestedMeta};
+use tools::*;
 
 /// Procedural macro that generates code for enums annotated with the `Mabe` derive macro.
 /// This macro processes the input enum and generates methods to retrieve error, reason, and solution messages for each variant
@@ -107,44 +108,21 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
             let (reason_msg, reason_args) = generic_format(reason_msg);
             let (solution_msg, solution_args) = generic_format(solution_msg);
 
-            let error_keyword_args = error_args
-                .iter()
-                .enumerate()
-                .map(|(i, arg)| {
-                    let keyword = format!("placeholder{}", i);
-                    quote! { #keyword = #arg }
-                })
-                .collect::<Vec<_>>();
-
-            let reason_keyword_args = reason_args
-                .iter()
-                .enumerate()
-                .map(|(i, arg)| {
-                    let keyword = format!("placeholder{}", i);
-                    quote! { #keyword = #arg }
-                })
-                .collect::<Vec<_>>();
-
-            let solution_keyword_args = solution_args
-                .iter()
-                .enumerate()
-                .map(|(i, arg)| {
-                    let keyword = format!("placeholder{}", i);
-                    quote! { #keyword = #arg }
-                })
-                .collect::<Vec<_>>();
-
             // Generates the match arms for the variant based on the type of fields it contains.
             match &variant.fields {
                 Fields::Unit => {
+                    let (_, error_keyword_args) = pattern_map(&error_args, &[], true);
+                    let (_, reason_keyword_args) = pattern_map(&reason_args, &[], true);
+                    let (_, solution_keyword_args) = pattern_map(&solution_args, &[], true);
+
                     error_match_arms.push(quote! {
-                        #enum_ident::#variant_ident => format!(#error_msg, #(#error_keyword_args),*),
+                        Self::#variant_ident => format!(#error_msg, #(#error_keyword_args),*),
                     });
                     reason_match_arms.push(quote! {
-                        #enum_ident::#variant_ident => format!(#reason_msg, #(#reason_keyword_args),*),
+                        Self::#variant_ident => format!(#reason_msg, #(#reason_keyword_args),*),
                     });
                     solution_match_arms.push(quote! {
-                        #enum_ident::#variant_ident => format!(#solution_msg, #(#solution_keyword_args),*),
+                        Self::#variant_ident => format!(#solution_msg, #(#solution_keyword_args),*),
                     });
                 }
                 Fields::Unnamed(fields) => {
@@ -159,22 +137,18 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
                         }
                     }
 
-                    let pattern_bindings = fields
-                        .iter()
-                        .map(|f| {
-                            let ident = syn::Ident::new(f, Span::call_site().into());
-                            quote! { #ident }
-                        })
-                        .collect::<Vec<_>>();
+                    let (error_pattern_bindings, error_keyword_args) = pattern_map(&error_args, &fields, true);
+                    let (reason_pattern_bindings, reason_keyword_args) = pattern_map(&reason_args, &fields, true);
+                    let (solution_pattern_bindings, solution_keyword_args) = pattern_map(&solution_args, &fields, true);
 
                     error_match_arms.push(quote! {
-                        #enum_ident::#variant_ident(#(#pattern_bindings),*) => format!(#error_msg, #(#error_keyword_args),*),
+                        Self::#variant_ident(#(#error_pattern_bindings),*) => format!(#error_msg, #(#error_keyword_args),*),
                     });
                     reason_match_arms.push(quote! {
-                        #enum_ident::#variant_ident(#(#pattern_bindings),*) => format!(#reason_msg, #(#reason_keyword_args),*),
+                        Self::#variant_ident(#(#reason_pattern_bindings),*) => format!(#reason_msg, #(#reason_keyword_args),*),
                     });
                     solution_match_arms.push(quote! {
-                        #enum_ident::#variant_ident(#(#pattern_bindings),*) => format!(#solution_msg, #(#solution_keyword_args),*),
+                        Self::#variant_ident(#(#solution_pattern_bindings),*) => format!(#solution_msg, #(#solution_keyword_args),*),
                     });
                 }
                 Fields::Named(fields) => {
@@ -183,7 +157,7 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
                         .map(|f| {
                             f.ident
                                 .clone()
-                                .expect(format!("Failed to retrieve the identifier of a named field in the `{}` variant. This error should not be possible, try reloading the window. If the problem persists, report it to the crate's [GitHub repository](https://github.com/AmonRayfa/mabe).", variant_ident).as_str())
+                                .unwrap_or_else(|| panic!("Failed to retrieve the identifier of a named field in the `{}` variant. This error should not be possible, try reloading the window. If the problem persists, report it to the crate's [GitHub repository](https://github.com/AmonRayfa/mabe).", variant_ident))
                                 .to_string()
                         })
                         .collect::<Vec<_>>();
@@ -197,22 +171,18 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
                         }
                     }
 
-                    let pattern_bindings = fields
-                        .iter()
-                        .map(|f| {
-                            let ident = syn::Ident::new(f, Span::call_site().into());
-                            quote! { #ident }
-                        })
-                        .collect::<Vec<_>>();
+                    let (error_pattern_bindings, error_keyword_args) = pattern_map(&error_args, &fields, false);
+                    let (reason_pattern_bindings, reason_keyword_args) = pattern_map(&reason_args, &fields, false);
+                    let (solution_pattern_bindings, solution_keyword_args) = pattern_map(&solution_args, &fields, false);
 
                     error_match_arms.push(quote! {
-                        #enum_ident::#variant_ident { #(#pattern_bindings),* } => format!(#error_msg, #(#error_keyword_args),*),
+                        Self::#variant_ident { #(#error_pattern_bindings),* } => format!(#error_msg, #(#error_keyword_args),*),
                     });
                     reason_match_arms.push(quote! {
-                        #enum_ident::#variant_ident { #(#pattern_bindings),* } => format!(#reason_msg, #(#reason_keyword_args),*),
+                        Self::#variant_ident { #(#reason_pattern_bindings),* } => format!(#reason_msg, #(#reason_keyword_args),*),
                     });
                     solution_match_arms.push(quote! {
-                        #enum_ident::#variant_ident { #(#pattern_bindings),* } => format!(#solution_msg, #(#solution_keyword_args),*),
+                        Self::#variant_ident { #(#solution_pattern_bindings),* } => format!(#solution_msg, #(#solution_keyword_args),*),
                     });
                 }
             }
@@ -221,7 +191,7 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
         panic!("The `Mabe` derive macro can only be used with enums.");
     }
 
-    TokenStream::from(quote! {
+    let implementations = quote! {
         impl #enum_ident {
             pub fn error(&self) -> String { match self { #(#error_match_arms)* } }
 
@@ -237,5 +207,7 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
         }
 
         impl std::error::Error for #enum_ident {}
-    })
+    };
+
+    TokenStream::from(implementations)
 }

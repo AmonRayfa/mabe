@@ -49,3 +49,9 @@ pub fn active_right_brace(msg: &String, checkpoint: usize) -> Option<usize> {
         None => None,
     }
 }
+
+/// Returns the index of the first string in a vector that is equal to the target string.
+/// If no such string is found, `None` is returned.
+pub fn find_index(vec: &[String], target: &String) -> Option<usize> {
+    vec.iter().position(|s| s == target)
+}

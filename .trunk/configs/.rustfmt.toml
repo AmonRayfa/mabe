@@ -8,5 +8,5 @@ reorder_imports = true
 struct_lit_single_line = true
 tab_spaces = 4
 trailing_comma = "Vertical"
-use_small_heuristics = "Default"
+use_small_heuristics = "Max"
 wrap_comments = true

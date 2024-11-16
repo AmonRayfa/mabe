@@ -2,31 +2,4 @@ version: "0.2"
 # Suggestions can sometimes take longer on CI machines,
 # leading to inconsistent results.
 suggestionsTimeout: 5000 # ms
-words:
-  [
-    amonrayfa,
-    androideabi,
-    armv7,
-    clippy,
-    consec,
-    español,
-    français,
-    idents,
-    italiano,
-    koseka,
-    mabe,
-    markdownlint,
-    msvc,
-    njsproj,
-    ntvs,
-    português,
-    Русский,
-    rayfa,
-    rollup,
-    trunkio,
-    العربية,
-    हिन्दी,
-    한국어,
-    中文,
-    日本語,
-  ]
+words: [amonrayfa, clippy, consec, dunder, idents, koseka, mabe, markdownlint, njsproj, ntvs, rayfa, rollup, trunkio]

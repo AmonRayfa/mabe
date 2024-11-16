@@ -1,16 +1,23 @@
 [package]
 name = "mabe"
-version = "0.1.2"
-authors = ["Amon Rayfa <amon.rayfa@proton.me>"]
-homepage = "https://github.com/AmonRayfa/mabe"
-license = "Apache-2.0"
-description = "A Rust library for creating simple and coherently structured runtime errors."
-keywords = ["debugging", "error", "coherent", "simple", "structured"]
-categories = ["development-tools::debugging"]
-repository = "https://github.com/AmonRayfa/mabe"
-readme = "README.md"
+version = "0.2.0"
 edition = "2021"
-exclude = ["target/**"]
+authors = ["Amon Rayfa <amon.rayfa@proton.me>"]
+description = "A Rust library for creating simple and well-structured runtime errors for easy debugging."
+keywords = ["debugging", "easy", "errors", "simple", "structured"]
+categories = ["development-tools::debugging"]
+homepage = "https://github.com/AmonRayfa/mabe"
+repository = "https://github.com/AmonRayfa/mabe"
+license = "Apache-2.0"
+readme = "README.md"
+exclude = [
+  ".trunk/**",
+  "node_modules/**",
+  "target/**",
+  ".gitignore",
+  "package.json",
+  "pnpm-lock.yaml",
+]
 publish = true
 
 [profile]
@@ -31,6 +38,6 @@ name = "struct_variants"
 
 [dependencies]
 colored = "2"
-mabe_utils = { path = "../mabe_utils" }
+proc-macro2 = "1"
 quote = "1"
 syn = "1"

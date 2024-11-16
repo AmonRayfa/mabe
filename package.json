@@ -1,14 +1,14 @@
 {
-  "name": "mabe",
-  "private": true,
-  "version": "0.1.0",
-  "type": "module",
-  "scripts": {
-    "trunk": "trunk",
-    "lint": "trunk check",
-    "fmt": "trunk fmt"
-  },
-  "devDependencies": {
-    "@trunkio/launcher": "^1.3.2"
-  }
+	"name": "mabe",
+	"private": true,
+	"version": "0.2.0",
+	"type": "module",
+	"scripts": {
+		"trunk": "trunk",
+		"lint": "trunk check",
+		"fmt": "trunk fmt"
+	},
+	"devDependencies": {
+		"@trunkio/launcher": "^1.3.4"
+	}
 }

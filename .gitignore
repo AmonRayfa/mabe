@@ -28,11 +28,7 @@ tmp
 *.sw?
 .DS_Store
 .idea
-.vscode/*
-!.vscode/*.code-snippets
-!.vscode/extensions.json
-!.vscode/launch.json
-!.vscode/settings.json
+.vscode
 
 # Logs
 *.log

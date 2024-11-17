@@ -1,6 +1,6 @@
 [package]
 name = "mabe"
-version = "0.2.1"
+version = "0.3.0"
 edition = "2021"
 authors = ["Amon Rayfa <amon.rayfa@proton.me>"]
 description = "A Rust library for creating simple and well-structured runtime errors for easy debugging."
@@ -37,7 +37,13 @@ name = "tuple_variants"
 name = "struct_variants"
 
 [dependencies]
-colored = "2"
 proc-macro2 = "1"
 quote = "1"
 syn = "1"
+
+[dev-dependencies]
+colored = "2"
+
+[features]
+default = []
+colored = []

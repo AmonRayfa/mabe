@@ -1,9 +1,9 @@
 # Mabe
 
-Mabe is a **Rust** library that provides a _derive macro_ (`Mabe`) for creating simple and well-structured error enums for easy
-debugging. Each variant in the enum can have an error, reason, and solution message. This allows for a more detailed error
-handling and debugging process. Also, when an error is printed, the error, reason, and solution messages are displayed in a
-structured and colorized format for better readability.
+[**Mabe**](https://crates.io/crates/mabe) is a _Rust procedural macro crate_ that provides tools for creating simple and
+well-structured error enums for easy debugging. Each variant in the enum can have an error, reason, and solution message. This
+allows for a more detailed error handling and debugging process. Also, when an error is printed, the error, reason, and solution
+messages are displayed in a structured and readable format.
 
 ## Getting Started
 
@@ -25,6 +25,11 @@ pub enum SystemError {
     #[reason("The error occurred because ...")]
     #[solution("Try doing ...")]
     BuildFailure,
+
+    // The output of the variant when printed will be:
+    // [error] Failed to build the system.
+    // [reason] The error occurred because ...
+    // [solution] Try doing ...
 }
 ```
 

@@ -182,18 +182,11 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
     let enum_ident = &input.ident;
 
     #[cfg(feature = "colored")]
-    let error_msg_prefix = quote! { "[error]".red().bold() };
-    #[cfg(feature = "colored")]
-    let reason_msg_prefix = quote! { "[reason]".yellow().bold() };
-    #[cfg(feature = "colored")]
-    let solution_msg_prefix = quote! { "[solution]".green().bold() };
+    let write_messages = quote! { write!(f, "\n{} {}\n{} {}\n{} {}", "[error]".red().bold(), self.error(), "[reason]".yellow().bold(), self.reason(), "[solution]".green().bold(), self.solution()) };
 
     #[cfg(not(feature = "colored"))]
-    let error_msg_prefix = quote! { "[error]" };
-    #[cfg(not(feature = "colored"))]
-    let reason_msg_prefix = quote! { "[reason]" };
-    #[cfg(not(feature = "colored"))]
-    let solution_msg_prefix = quote! { "[solution]" };
+    let write_messages =
+        quote! { write!(f, "\n[error] {}\n[reason] {}\n[solution] {}", self.error(), self.reason(), self.solution()) };
 
     let implementations = quote! {
         impl #enum_ident {
@@ -206,7 +199,7 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
 
         impl std::fmt::Display for #enum_ident {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                write!(f, "\n{} {}\n{} {}\n{} {}", #error_msg_prefix, self.error(), #reason_msg_prefix, self.reason(), #solution_msg_prefix, self.solution())
+                #write_messages
             }
         }
 

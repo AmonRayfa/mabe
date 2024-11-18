@@ -1,6 +1,6 @@
 [package]
 name = "mabe"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2021"
 authors = ["Amon Rayfa <amon.rayfa@proton.me>"]
 description = "A Rust library for creating simple and well-structured runtime errors for easy debugging."

@@ -68,7 +68,7 @@ extern crate proc_macro;
 mod utils;
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, Data, DeriveInput, Fields, Lit, Meta, NestedMeta};
+use syn::{parse_macro_input, Data, DeriveInput, Fields};
 use utils::*;
 
 /// Procedural macro that generates code for enums annotated with the `Mabe` derive macro.
@@ -90,80 +90,10 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
         // Iterates over all the variants of the enum to generate the appropriate match arms for each of them.
         for variant in &enum_data.variants {
             let variant_ident = &variant.ident;
-            let mut error_msg = String::new();
-            let mut reason_msg = String::new();
-            let mut solution_msg = String::new();
 
-            // Iterates over all the attributes of a variant to extract the error, reason, and solution messages.
-            for attr in &variant.attrs {
-                if let Ok(Meta::List(meta_list)) = attr.parse_meta() {
-                    if let Some(attr_ident) = meta_list.path.get_ident() {
-                        match attr_ident.to_string().as_str() {
-                            "error" => {
-                                if meta_list.nested.len() != 1 {
-                                    panic!(
-                                        "Expected 1 argument for the `#[error]` attribute of the `{}` variant, found {}.",
-                                        variant_ident,
-                                        meta_list.nested.len()
-                                    );
-                                }
-                                if let NestedMeta::Lit(Lit::Str(lit_str)) = &meta_list.nested[0] {
-                                    error_msg = lit_str.value();
-                                } else {
-                                    panic!(
-                                        "Expected a `&str` argument for the `#[error]` attribute of the `{}` variant.",
-                                        variant_ident
-                                    );
-                                }
-                            }
-                            "reason" => {
-                                if meta_list.nested.len() != 1 {
-                                    panic!(
-                                        "Expected 1 argument for the `#[reason]` attribute of the `{}` variant, found {}.",
-                                        variant_ident,
-                                        meta_list.nested.len()
-                                    );
-                                }
-                                if let NestedMeta::Lit(Lit::Str(lit_str)) = &meta_list.nested[0] {
-                                    reason_msg = lit_str.value();
-                                } else {
-                                    panic!(
-                                        "Expected a `&str` argument for the `#[reason]` attribute of the `{}` variant.",
-                                        variant_ident
-                                    );
-                                }
-                            }
-                            "solution" => {
-                                if meta_list.nested.len() != 1 {
-                                    panic!(
-                                        "Expected 1 argument for the `#[solution]` attribute of the `{}` variant, found {}.",
-                                        variant_ident,
-                                        meta_list.nested.len()
-                                    );
-                                }
-                                if let NestedMeta::Lit(Lit::Str(lit_str)) = &meta_list.nested[0] {
-                                    solution_msg = lit_str.value();
-                                } else {
-                                    panic!(
-                                        "Expected a `&str` argument for the `#[solution]` attribute of the `{}` variant.",
-                                        variant_ident
-                                    );
-                                }
-                            }
-                            _ => {}
-                        }
-                    }
-                } else {
-                    panic!(
-                        "Failed to parse the attributes of the `{}` variant, make sure the attributes are correctly formatted.",
-                        variant_ident
-                    );
-                }
-            }
-
-            let (error_msg, error_args) = generic_format(error_msg);
-            let (reason_msg, reason_args) = generic_format(reason_msg);
-            let (solution_msg, solution_args) = generic_format(solution_msg);
+            let (error_msg, error_args) = generic_format(get_attr_msg("error", variant));
+            let (reason_msg, reason_args) = generic_format(get_attr_msg("reason", variant));
+            let (solution_msg, solution_args) = generic_format(get_attr_msg("solution", variant));
 
             // Generates the match arms for the variant based on the type of fields it contains.
             match &variant.fields {

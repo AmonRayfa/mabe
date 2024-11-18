@@ -5,7 +5,58 @@ mod finders;
 use finders::*;
 use proc_macro2::{Span, TokenStream};
 use quote::quote;
-use syn::Ident;
+use syn::{Ident, Lit, Meta, NestedMeta, Variant};
+
+/// A tool that returns the message of an attribute of a variant.
+/// The supported attributes are `error`, `reason`, and `solution`.
+/// If the attribute is not found, an empty string is returned.
+pub fn get_attr_msg<A: ToString>(attribute: A, variant: &Variant) -> String {
+    let attribute = attribute.to_string();
+
+    if attribute != "error" && attribute != "reason" && attribute != "solution" {
+        panic!(
+            "The `#[{}]` attribute is not supported, supported attributes are `error`, `reason`, and `solution`. This error should not be able to occur in production code. Try reloading the window. If the problem persists, report the issue to the crate's [GitHub repository](https://github.com/AmonRayfa/mabe).",
+            attribute
+        );
+    }
+
+    variant
+        .attrs
+        .iter()
+        .rev()
+        .filter_map(|attr| {
+            if let Ok(Meta::List(meta_list)) = attr.parse_meta() {
+                if let Some(attr_ident) = meta_list.path.get_ident() {
+                    if *attr_ident == attribute {
+                        if meta_list.nested.len() != 1 {
+                            panic!(
+                                "Expected 1 argument for the `#[{}]` attribute of the `{}` variant, found {}.",
+                                attribute,
+                                variant.ident,
+                                meta_list.nested.len()
+                            );
+                        }
+                        if let NestedMeta::Lit(Lit::Str(lit_str)) = &meta_list.nested[0] {
+                            return Some(lit_str.value());
+                        } else {
+                            panic!(
+                                "Expected a `&str` argument for the `#[{}]` attribute of the `{}` variant.",
+                                attribute, variant.ident
+                            );
+                        }
+                    }
+                }
+            } else {
+                panic!(
+                    "Failed to parse the attributes of the `{}` variant, make sure the attributes are correctly formatted.",
+                    variant.ident
+                );
+            }
+            None
+        })
+        .find(|_| true)
+        .unwrap_or_else(String::new)
+}
 
 /// A tool that returns a tuple containing the formatted message and the extracted arguments
 /// as `String` and `Vec<String>` types respectively.

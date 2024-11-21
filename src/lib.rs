@@ -25,10 +25,8 @@
 //!     Unauthorized,
 //! }
 //!
-//! fn main() {
-//!     let error = ServerError::Unauthorized;
-//!     println!("{}", error);
-//! }
+//! let error = ServerError::Unauthorized;
+//! println!("{}", error);
 //! ```
 //!
 //! ```text
@@ -62,13 +60,11 @@
 //!     ConnectionLost { reason: String, retry_in: u32 }
 //! }
 //!
-//! fn main() {
-//!     let error1 = ServerError::NetworkFailure(404, "Not Found".to_string());
-//!     println!("{}", error1);
+//! let error1 = ServerError::NetworkFailure(404, "Not Found".to_string());
+//! println!("{}", error1);
 //!
-//!     let error2 = ServerError::ConnectionLost { reason: "Server down".to_string(), retry_in: 10 };
-//!     println!("{}", error2);
-//! }
+//! let error2 = ServerError::ConnectionLost { reason: "Server down".to_string(), retry_in: 10 };
+//! println!("{}", error2);
 //! ```
 //!
 //! ```text

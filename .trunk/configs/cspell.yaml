@@ -2,4 +2,21 @@ version: "0.2"
 # Suggestions can sometimes take longer on CI machines,
 # leading to inconsistent results.
 suggestionsTimeout: 5000 # ms
-words: [amonrayfa, clippy, consec, dunder, idents, koseka, mabe, markdownlint, njsproj, ntvs, rayfa, rollup, trunkio]
+words:
+  [
+    amonrayfa,
+    clippy,
+    consec,
+    dunder,
+    idents,
+    koseka,
+    mabe,
+    markdownlint,
+    njsproj,
+    nocapture,
+    ntvs,
+    println,
+    rayfa,
+    rollup,
+    trunkio,
+  ]

@@ -4,65 +4,87 @@
 //! [**Mabe**](https://github.com/AmonRayfa/mabe) is a *procedural macro crate* that provides tools for creating simple and
 //! well-structured error enums for easy debugging. Each variant in the enum can have an error, reason, and solution message.
 //! This allows for a more detailed error handling and debugging process. Also, when an error is printed, the error, reason,
-//! and solution messages are displayed in a structured and readable format.
+//! and solution messages are displayed in a structured and easy-to-read format.
 //!
 //! # Examples
-//! Simple example of using the `Mabe` derive macro:
-//! ```
-//! #[cfg(feature = "colored")]
-//! use colored::Colorize; // Imports the `Colorize` trait only if the `colored` feature is enabled.
 //!
-//! use mabe::Mabe;
+//! Simple example of using the [`Mabe`](https://docs.rs/mabe/latest/mabe/derive.Mabe.html) derive macro:
 //!
-//! #[derive(Debug, Mabe)]
-//! pub enum SystemError {
-//!     #[error("Failed to build the system.")]
-//!     #[reason("The error occurred because ...")]
-//!     #[solution("Try doing ...")]
-//!     BuildFailure,
-//!
-//!     // The output of the variant when printed will be:
-//!     // [error] Failed to build the system.
-//!     // [reason] The error occurred because ...
-//!     // [solution] Try doing ...
-//! }
 //! ```
-//! You can also interpolate the values of variant fields in the error, reason, and solution messages as shown below:
-//! ```
-//! #[cfg(feature = "colored")]
-//! use colored::Colorize; // Imports the `Colorize` trait only if the `colored` feature is enabled.
+//! // Imports the `Colorize` trait only when the `colored` feature is enabled.
+//! #[cfg(feature = "colored")] // Remove this line when using the crate in a real project.
+//! use colored::Colorize;
 //!
 //! use mabe::Mabe;
 //!
 //! #[derive(Debug, Mabe)]
 //! pub enum ServerError {
 //!     #[error("You are not authorized to access this resource.")]
+//!     #[reason("Your account does not have the required permissions.")]
 //!     #[solution("Try using a different account.")]
 //!     Unauthorized,
+//! }
 //!
+//! fn main() {
+//!     let error = ServerError::Unauthorized;
+//!     println!("{}", error);
+//! }
+//! ```
+//!
+//! ```text
+//! Output:
+//! [error] You are not authorized to access this resource.
+//! [reason] Your account does not have the required permissions.
+//! [solution] Try using a different account.
+//! ```
+//!
+//! You can also interpolate the values of variant fields in the error, reason, and solution messages as shown below:
+//!
+//! ```
+//! // Imports the `Colorize` trait only when the `colored` feature is enabled.
+//! #[cfg(feature = "colored")] // Remove this line when using the crate in a real project.
+//! use colored::Colorize;
+//!
+//! use mabe::Mabe;
+//!
+//! #[derive(Debug, Mabe)]
+//! pub enum ServerError {
 //!     #[error("Network failure.")]
-//!     // Interpolating the values of the 1st and 2nd field in the reason message.
+//!     // Interpolates the values of the 1st and 2nd field in the reason message.
 //!     #[reason("Code {0}: {1}.")]
 //!     NetworkFailure(u32, String),
 //!
 //!     #[error("Connection lost.")]
-//!     // Interpolating the value of the `reason` field in the reason message.
+//!     // Interpolates the value of the `reason` field in the reason message.
 //!     #[reason("{reason}")]
-//!     // Interpolating the value of the `retry_in` field in the solution message.
+//!     // Interpolates the value of the `retry_in` field in the solution message.
 //!     #[solution("Retry in {retry_in} seconds.")]
 //!     ConnectionLost { reason: String, retry_in: u32 }
 //! }
+//!
+//! fn main() {
+//!     let error1 = ServerError::NetworkFailure(404, "Not Found".to_string());
+//!     println!("{}", error1);
+//!
+//!     let error2 = ServerError::ConnectionLost { reason: "Server down".to_string(), retry_in: 10 };
+//!     println!("{}", error2);
+//! }
 //! ```
 //!
-//! The `Mabe` derive macro is quite resilient, as a compile error will only occur if one of the following rules is violated:
+//! ```text
+//! Output:
+//! [error] Network failure.
+//! [reason] Code 404: Not Found.
+//! [solution]
 //!
-//! 1. The element on which `Mabe` is used must be an enum.
-//! 2. The enum must have at least one variant.
-//! 3. Each attribute must have exactly one argument of type `&str` (string literal).
-//! 4. Each variant field must be interpolated in at least one of the attribute messages of the variant.
+//! [error] Connection lost.
+//! [reason] Server down.
+//! [solution] Retry in 10 seconds.
+//! ```
 //!
 //! # Features
-//! * **colored**: Adds colors to the error, reason, and solution messages when they are printed. In order to use this feature, you need to add [`colored`](https://docs.rs/colored/latest/colored) to your dependencies in your `Cargo.toml` file and import the [`colored::Colorize`](https://docs.rs/colored/latest/colored/trait.Colorize.html) trait in your code where your error enums are defined.
+//!
+//! * **colored**: Adds colors to the prefixes of the error, reason, and solution messages (i.e. to `[error]`, `[reason]`, and `[solution]`) when they are printed. In order to use this feature, the [colored](https://crates.io/crates/colored) crate must be included in the dependencies of the project and the [`Colorize`](https://docs.rs/colored/latest/colored/trait.Colorize.html) trait must be imported where the error enums are defined.
 
 extern crate proc_macro;
 mod utils;
@@ -71,9 +93,9 @@ use quote::quote;
 use syn::{parse_macro_input, Data, DeriveInput, Fields};
 use utils::*;
 
-/// Procedural macro that generates code for enums annotated with the `Mabe` derive macro.
-/// This macro processes the enum and generates methods to retrieve error, reason, and solution messages for each variant
-/// of the enum along with an implementation for the [`Display`](std::fmt::Display) and [`Error`](std::error::Error) traits.
+/// Allows for the creation of simple and well-structured error enums for easy debugging by providing error, reason,
+/// and solution attributes for each variant, and generating methods to retrieve the messages of these attributes.
+/// Additionally, it generates an implementation for the [`Display`](std::fmt::Display) and [`Error`](std::error::Error) traits.
 #[proc_macro_derive(Mabe, attributes(error, reason, solution))]
 pub fn mabe_derive(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);

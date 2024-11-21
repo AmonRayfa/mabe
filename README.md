@@ -11,7 +11,7 @@ Add the following dependency to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-mabe = "0.2"
+mabe = "0.3"
 ```
 
 You can now use the `Mabe` derive macro and its attributes to create your own error enums as shown in the example below:
@@ -20,17 +20,24 @@ You can now use the `Mabe` derive macro and its attributes to create your own er
 use mabe::Mabe;
 
 #[derive(Debug, Mabe)]
-pub enum SystemError {
-    #[error("Failed to build the system.")]
-    #[reason("The error occurred because ...")]
-    #[solution("Try doing ...")]
-    BuildFailure,
-
-    // The output of the variant when printed will be:
-    // [error] Failed to build the system.
-    // [reason] The error occurred because ...
-    // [solution] Try doing ...
+pub enum ServerError {
+    #[error("You are not authorized to access this resource.")]
+    #[reason("Your account does not have the required permissions.")]
+    #[solution("Try using a different account.")]
+    Unauthorized,
 }
+
+fn main() {
+    let error = ServerError::Unauthorized;
+    println!("{}", error);
+}
+```
+
+```plaintext
+Output:
+[error] You are not authorized to access this resource.
+[reason] Your account does not have the required permissions.
+[solution] Try using a different account.
 ```
 
 You can also interpolate the values of variant fields in the error, reason, and solution messages as shown below:
@@ -40,30 +47,38 @@ use mabe::Mabe;
 
 #[derive(Debug, Mabe)]
 pub enum ServerError {
-    #[error("You are not authorized to access this resource.")]
-    #[solution("Try using a different account.")]
-    Unauthorized,
-
     #[error("Network failure.")]
-    // Interpolating the values of the 1st and 2nd field in the reason message.
+    // Interpolates the values of the 1st and 2nd field in the reason message.
     #[reason("Code {0}: {1}.")]
     NetworkFailure(u32, String),
 
     #[error("Connection lost.")]
-    // Interpolating the value of the `reason` field in the reason message.
+    // Interpolates the value of the `reason` field in the reason message.
     #[reason("{reason}")]
-    // Interpolating the value of the `retry_in` field in the solution message.
+    // Interpolates the value of the `retry_in` field in the solution message.
     #[solution("Retry in {retry_in} seconds.")]
     ConnectionLost { reason: String, retry_in: u32 }
 }
+
+fn main() {
+    let error1 = ServerError::NetworkFailure(404, "Not Found".to_string());
+    println!("{}", error1);
+
+    let error2 = ServerError::ConnectionLost { reason: "Server down".to_string(), retry_in: 10 };
+    println!("{}", error2);
+}
 ```
 
-The `Mabe` derive macro is quite resilient, as a compile error will only occur if one of the following rules is violated:
+```plaintext
+Output:
+[error] Network failure.
+[reason] Code 404: Not Found.
+[solution]
 
-1. The element on which `Mabe` is used must be an enum.
-2. The enum must have at least one variant.
-3. Each attribute must have exactly one argument of type `&str` (string literal).
-4. Each variant field must be interpolated in at least one of the attribute messages of the variant.
+[error] Connection lost.
+[reason] Server down.
+[solution] Retry in 10 seconds.
+```
 
 ## Contributing
 

@@ -1,6 +1,6 @@
 [package]
 name = "mabe"
-version = "0.3.1"
+version = "0.4.0"
 edition = "2021"
 authors = ["Amon Rayfa <amon.rayfa@proton.me>"]
 description = "A simple framework for creating debug-friendly error enums in Rust."
@@ -46,4 +46,4 @@ colored = "2"
 
 [features]
 default = []
-colored = []
+color = []

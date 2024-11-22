@@ -78,7 +78,7 @@
 //! [Cargo features](https://doc.rust-lang.org/stable/cargo/reference/features.html#the-features-section) that can be enabled or
 //! disabled in the `Cargo.toml` file:
 //!
-//! * **colored**: Adds colors to the prefixes of the error, reason, and solution messages (i.e. to `[error]`, `[reason]`, and
+//! * **color**: Adds colors to the prefixes of the error, reason, and solution messages (i.e. to `[error]`, `[reason]`, and
 //!   `[solution]`) when they are printed. In order to use this feature, the [`colored`](https://crates.io/crates/colored) crate
 //!   must be included in the dependencies of the project and the
 //!   [`Colorize`](https://docs.rs/colored/latest/colored/trait.Colorize.html) trait must be imported where the error enums are
@@ -201,10 +201,10 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
 
     let enum_ident = &input.ident;
 
-    #[cfg(feature = "colored")]
+    #[cfg(feature = "color")]
     let write_messages = quote! { write!(f, "\n{} {}\n{} {}\n{} {}", "[error]".red().bold(), self.error(), "[reason]".yellow().bold(), self.reason(), "[solution]".green().bold(), self.solution()) };
 
-    #[cfg(not(feature = "colored"))]
+    #[cfg(not(feature = "color"))]
     let write_messages =
         quote! { write!(f, "\n[error] {}\n[reason] {}\n[solution] {}", self.error(), self.reason(), self.solution()) };
 

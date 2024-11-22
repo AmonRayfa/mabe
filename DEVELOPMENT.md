@@ -89,7 +89,7 @@ All tests are located in the `src/tests/` directory and can be run using the fol
 cargo test                                                  # Runs all the tests in the project.
 cargo test unit_variants                                    # Runs the tests for the `unit_variants` module.
 cargo test -- --nocapture                                   # Runs the tests and displays the output of the tests.
-cargo test --features colored                               # Runs the tests for the `colored` feature.
+cargo test --features color                                 # Runs the tests for the `color` feature.
 cargo test --all-features                                   # Runs the tests for all the features.
 ```
 
@@ -99,7 +99,7 @@ You can build the project using the following commands:
 cargo doc --open                                            # Generates the documentation and opens it in the browser.
 cargo build                                                 # Builds the project in debug mode.
 cargo build --release                                       # Builds the project in release mode.
-cargo build --features colored                              # Builds the project with the `colored` feature.
+cargo build --features color                                # Builds the project with the `color` feature.
 cargo build --all-features                                  # Builds the project with all the features.
 ```
 

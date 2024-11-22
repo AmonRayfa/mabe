@@ -15,7 +15,7 @@
 //! ```ignore
 //! use mabe::Mabe;
 //!
-//! #[derive(Debug, Mabe)]
+//! #[derive(Mabe)]
 //! pub enum ServerError {
 //!     #[error("You are not authorized to access this resource.")]
 //!     #[reason("Your account does not have the required permissions.")]
@@ -39,7 +39,7 @@
 //! ```ignore
 //! use mabe::Mabe;
 //!
-//! #[derive(Debug, Mabe)]
+//! #[derive(Mabe)]
 //! pub enum ServerError {
 //!     #[error("Network failure.")]
 //!     // Interpolates the values of the 1st and 2nd field in the reason message.
@@ -93,11 +93,14 @@ use utils::*;
 
 /// Allows for the creation of simple and well-structured error enums for easy debugging by providing error, reason,
 /// and solution attributes for each variant, and generating methods to retrieve the messages of these attributes.
-/// Additionally, it generates an implementation for the [`Display`](std::fmt::Display) and [`Error`](std::error::Error) traits.
+/// Additionally, it generates an implementation for the [`Debug`](std::fmt::Debug), [`Display`](std::fmt::Display) and
+/// [`Error`](std::error::Error) traits.
 #[proc_macro_derive(Mabe, attributes(error, reason, solution))]
 pub fn mabe_derive(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
+    let enum_ident = &input.ident;
 
+    let mut debug_match_arms = Vec::<proc_macro2::TokenStream>::new();
     let mut error_match_arms = Vec::<proc_macro2::TokenStream>::new();
     let mut reason_match_arms = Vec::<proc_macro2::TokenStream>::new();
     let mut solution_match_arms = Vec::<proc_macro2::TokenStream>::new();
@@ -111,6 +114,7 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
         for variant in &enum_data.variants {
             let variant_ident = &variant.ident;
 
+            let mut debug_msg = format!("{}::{}", enum_ident, variant_ident);
             let (error_msg, error_args) = generic_format(get_attr_msg("error", variant));
             let (reason_msg, reason_args) = generic_format(get_attr_msg("reason", variant));
             let (solution_msg, solution_args) = generic_format(get_attr_msg("solution", variant));
@@ -119,10 +123,14 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
             match &variant.fields {
                 Fields::Unit => {
                     let fields = Vec::<String>::new();
+
                     let (_, error_keyword_args) = pattern_map(&error_args, &fields, true);
                     let (_, reason_keyword_args) = pattern_map(&reason_args, &fields, true);
                     let (_, solution_keyword_args) = pattern_map(&solution_args, &fields, true);
 
+                    debug_match_arms.push(quote! {
+                        Self::#variant_ident => format!(#debug_msg),
+                    });
                     error_match_arms.push(quote! {
                         Self::#variant_ident => format!(#error_msg, #(#error_keyword_args),*),
                     });
@@ -135,20 +143,34 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
                 }
                 Fields::Unnamed(fields) => {
                     let fields = (0..fields.unnamed.iter().len()).map(|i| i.to_string()).collect::<Vec<String>>();
+                    debug_msg.push('(');
 
-                    for f in fields.iter() {
+                    for (i, f) in fields.iter().enumerate() {
                         if !error_args.contains(f) && !reason_args.contains(f) && !solution_args.contains(f) {
                             panic!(
-                            "The `{}` field of the `{}` variant is not used in the error, reason, or solution message. Make sure to include it in at least one of the messages.",
-                            f, variant_ident
-                        );
+                                "The `{}` field of the `{}` variant is not used in the error, reason, or solution message. Make sure to include it in at least one of the messages.",
+                                f, variant_ident
+                            );
+                        }
+
+                        if i == fields.len() - 1 {
+                            debug_msg.push_str(&format!("{{{}}}", f));
+                        } else {
+                            debug_msg.push_str(&format!("{{{}}}, ", f));
                         }
                     }
 
+                    debug_msg.push(')');
+                    let (debug_msg, debug_args) = generic_format(&debug_msg);
+
+                    let (debug_pattern_bindings, debug_keyword_args) = pattern_map(&debug_args, &fields, true);
                     let (error_pattern_bindings, error_keyword_args) = pattern_map(&error_args, &fields, true);
                     let (reason_pattern_bindings, reason_keyword_args) = pattern_map(&reason_args, &fields, true);
                     let (solution_pattern_bindings, solution_keyword_args) = pattern_map(&solution_args, &fields, true);
 
+                    debug_match_arms.push(quote! {
+                        Self::#variant_ident(#(#debug_pattern_bindings),*) => format!(#debug_msg, #(#debug_keyword_args),*),
+                    });
                     error_match_arms.push(quote! {
                         Self::#variant_ident(#(#error_pattern_bindings),*) => format!(#error_msg, #(#error_keyword_args),*),
                     });
@@ -170,19 +192,34 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
                     })
                     .collect::<Vec<String>>();
 
-                    for f in fields.iter() {
+                    debug_msg.push_str(" {{ ");
+
+                    for (i, f) in fields.iter().enumerate() {
                         if !error_args.contains(f) && !reason_args.contains(f) && !solution_args.contains(f) {
                             panic!(
-                            "The `{}` field of the `{}` variant is not used in the error, reason, or solution message. Make sure to include it in at least one of the messages.",
-                            f, variant_ident
-                        );
+                                "The `{}` field of the `{}` variant is not used in the error, reason, or solution message. Make sure to include it in at least one of the messages.",
+                                f, variant_ident
+                            );
+                        }
+
+                        if i == fields.len() - 1 {
+                            debug_msg.push_str(&format!("{}: {{{}}} ", f, f));
+                        } else {
+                            debug_msg.push_str(&format!("{}: {{{}}}, ", f, f));
                         }
                     }
 
+                    debug_msg.push_str("}}");
+                    let (debug_msg, debug_args) = generic_format(&debug_msg);
+
+                    let (debug_pattern_bindings, debug_keyword_args) = pattern_map(&debug_args, &fields, false);
                     let (error_pattern_bindings, error_keyword_args) = pattern_map(&error_args, &fields, false);
                     let (reason_pattern_bindings, reason_keyword_args) = pattern_map(&reason_args, &fields, false);
                     let (solution_pattern_bindings, solution_keyword_args) = pattern_map(&solution_args, &fields, false);
 
+                    debug_match_arms.push(quote! {
+                        Self::#variant_ident { #(#debug_pattern_bindings),* } => format!(#debug_msg, #(#debug_keyword_args),*),
+                    });
                     error_match_arms.push(quote! {
                         Self::#variant_ident { #(#error_pattern_bindings),* } => format!(#error_msg, #(#error_keyword_args),*),
                     });
@@ -199,17 +236,19 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
         panic!("The `Mabe` derive macro can only be used with enums.");
     }
 
-    let enum_ident = &input.ident;
+    let write_debug = quote! { write!(f, "{}", self.debug()) };
 
     #[cfg(feature = "color")]
-    let write_messages = quote! { write!(f, "\n{} {}\n{} {}\n{} {}", "[error]".red().bold(), self.error(), "[reason]".yellow().bold(), self.reason(), "[solution]".green().bold(), self.solution()) };
+    let write_display = quote! { write!(f, "\n{} {}\n{} {}\n{} {}", "[error]".red().bold(), self.error(), "[reason]".yellow().bold(), self.reason(), "[solution]".green().bold(), self.solution()) };
 
     #[cfg(not(feature = "color"))]
-    let write_messages =
+    let write_display =
         quote! { write!(f, "\n[error] {}\n[reason] {}\n[solution] {}", self.error(), self.reason(), self.solution()) };
 
     let implementations = quote! {
         impl #enum_ident {
+            pub fn debug(&self) -> String { match self { #(#debug_match_arms)* } }
+
             pub fn error(&self) -> String { match self { #(#error_match_arms)* } }
 
             pub fn reason(&self) -> String { match self { #(#reason_match_arms)* } }
@@ -217,9 +256,15 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
             pub fn solution(&self) -> String { match self { #(#solution_match_arms)* } }
         }
 
+        impl std::fmt::Debug for #enum_ident {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                #write_debug
+            }
+        }
+
         impl std::fmt::Display for #enum_ident {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                #write_messages
+                #write_display
             }
         }
 

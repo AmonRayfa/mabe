@@ -32,7 +32,7 @@ Here is a simple example of how to create a debug-friendly error enum:
 ```rust
 use mabe::Mabe;
 
-#[derive(Debug, Mabe)]
+#[derive(Mabe)]
 pub enum ServerError {
     #[error("You are not authorized to access this resource.")]
     #[reason("Your account does not have the required permissions.")]
@@ -56,7 +56,7 @@ You can also interpolate the values of variant fields in the error, reason, and 
 ```rust
 use mabe::Mabe;
 
-#[derive(Debug, Mabe)]
+#[derive(Mabe)]
 pub enum ServerError {
     #[error("Network failure.")]
     // Interpolates the values of the 1st and 2nd field in the reason message.

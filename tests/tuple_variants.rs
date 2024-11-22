@@ -6,7 +6,7 @@ use colored::Colorize;
 
 use mabe::Mabe;
 
-#[derive(Debug, Mabe)]
+#[derive(Mabe)]
 enum MyError {
     #[error("The error message for Error1. The placeholders are: {0}, {y} and {{0}}.")]
     #[reason("The reason message for Error1. The placeholders are: {msg}, {{{reason}}} and false.")]

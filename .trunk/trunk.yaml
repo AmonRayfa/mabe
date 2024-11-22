@@ -26,7 +26,7 @@ lint:
     - prettier@3.3.3
     - rustfmt@1.65.0
     - taplo@0.9.3
-    - trufflehog@3.83.6
+    - trufflehog@3.83.7
     - yamllint@1.35.1
 actions:
   enabled:

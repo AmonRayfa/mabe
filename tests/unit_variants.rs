@@ -6,7 +6,7 @@ use colored::Colorize;
 
 use mabe::Mabe;
 
-#[derive(Debug, Mabe)]
+#[derive(Mabe)]
 enum MyError {
     Error1,
 

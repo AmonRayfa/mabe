@@ -79,7 +79,7 @@ pnpm trunk fmt                                              # Formats all the ch
 pnpm trunk fmt --all                                        # Formats all the files in the repository.
 ```
 
-If you want to know about **Trunk**, you can check the [Trunk Documentation](https://docs.trunk.io).
+If you want to know more about **Trunk**, you can check the [Trunk Documentation](https://docs.trunk.io).
 
 ## Testing and Building the Project
 

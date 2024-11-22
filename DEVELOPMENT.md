@@ -1,43 +1,29 @@
 # Mabe Development
 
-This file is mainly intended for developers who want to contribute to the [Mabe](README.md) project. It provides information on
-how to set up the development environment, run tests, and build the project, as well as potential new features and improvements.
-
-The project follows the [Koseka Contribution Guidelines (Version 1.0)](https://koseka.org/contribution-guidelines/1.0) which
-provides standardized rules and guidelines for contributing to projects, so make sure to read this first before contributing to
-the project in any way.
-
-Remember that unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the project by
-you, shall be licensed under the [Apache-2.0 License](LICENSE), without any additional terms or conditions.
+This file is primarily intended for developers who wish to fork the project and potentially contribute to it. It provides
+instructions on setting up the development environment, linting and formatting the code, and testing and building the project.
 
 ## Table of Contents
 
 - [Setting Up the Development Environment](#setting-up-the-development-environment)
-- [Running Tests](#running-tests)
-- [Building the Project](#building-the-project)
-- [Potential New Features and Improvements](#potential-new-features-and-improvements)
+- [Linting and Formatting the Code](#linting-and-formatting-the-code)
+- [Testing and Building the Project](#testing-and-building-the-project)
 
 ## Setting Up the Development Environment
 
 First, ensure that you have the latest version of **Rust** installed on your machine. You can install **Rust** by following the
 instructions on the official [Rust website](https://www.rust-lang.org/tools/install).
 
-Second, this project uses [Trunk](https://www.trunk.io) as an npm package for formatting and linting the code, and **pnpm** as a
-package manager. So, make sure you have **node.js** and **pnpm** installed on your machine. You can install both of them from
-the official websites: [node.js](https://nodejs.org) and [pnpm](https://pnpm.io/installation).
+Second, this project uses [**Trunk**](https://www.trunk.io) as an npm package for formatting and linting the code, and **pnpm**
+as a package manager. So, make sure you have **node.js** and **pnpm** installed on your machine. You can install both of them
+from the official websites: [node.js](https://nodejs.org) and [pnpm](https://pnpm.io/installation).
 
-Next, clone the **mabe** repository to your local machine and navigate to the project directory:
-
-```sh
-git clone https://github.com/AmonRayfa/mabe.git
-cd mabe
-```
-
-Then, install the required dependencies using the following command:
+Next, clone the `mabe` repository to your local machine and install the development dependencies:
 
 ```sh
-pnpm install
-cargo build
+git clone https://github.com/AmonRayfa/mabe.git             # Clones the repository.
+cd mabe                                                     # Moves into the project directory.
+pnpm install                                                # Installs the development dependencies.
 ```
 
 Since **Trunk** is used for formatting the code, it's best if you disable the _format on save_ option in your editor to avoid
@@ -65,92 +51,56 @@ As for the linting, the project comes with its own linters and configurations, s
 custom configurations, you should make sure they don't conflict with the project's linters. You can check the list of linters
 (and formatters) along with their configurations in the `.trunk/trunk.yaml` file and the `.trunk/configs/` directory.
 
-The linters and formatters work through git hooks, so they will run automatically when you commit changes. If you want more
-information on how they work, you can check the [Trunk documentation](https://docs.trunk.io).
-
 If you have followed all the steps correctly, you should now have a working development environment for the project. If you
 encounter any issues, feel free to open an issue on the project's [GitHub repository](https://github.com/AmonRayfa/mabe/issues).
 
-## Running Tests
+## Linting and Formatting the Code
 
-All tests are located in the `src/tests/` directory and can be run using the following command:
+The linters and formatters work through git hooks, so they will run automatically when you commit changes. However, it's best to
+also run them manually before committing changes to avoid failing the commit hook.
 
-```sh
-cargo test
-```
-
-This command will run all the tests in the project and display the results in the terminal. If you want to run a specific test
-or a specific set of tests, run the following command:
+To make sure **Trunk** is managing the git hooks, you can run the following command:
 
 ```sh
-cargo test <test_name_1> <test_name_2> ...
+pnpm trunk git-hooks sync
 ```
 
-If you want to run the tests and display the output of the `println!` macros in the tests, you can use the following command:
+You can manually run the linters and formatters using the following commands:
 
 ```sh
-cargo test -- --nocapture
+pnpm trunk check                                            # Runs linters and formatters on all the changed files.
+pnpm trunk check --all                                      # Runs linters and formatters on all the files in the repository.
 ```
 
-If you want to run the tests for the **colored** feature, you can use the following command:
+You can manually format the code using the following commands:
 
 ```sh
-cargo test --features colored
+pnpm trunk fmt                                              # Formats all the changed files.
+pnpm trunk fmt --all                                        # Formats all the files in the repository.
 ```
 
-If you want to run the tests for all the features, you can use the following command:
+If you want to know about **Trunk**, you can check the [Trunk Documentation](https://docs.trunk.io).
+
+## Testing and Building the Project
+
+All tests are located in the `src/tests/` directory and can be run using the following commands:
 
 ```sh
-cargo test --all-features
+cargo test                                                  # Runs all the tests in the project.
+cargo test unit_variants                                    # Runs the tests for the `unit_variants` module.
+cargo test -- --nocapture                                   # Runs the tests and displays the output of the tests.
+cargo test --features colored                               # Runs the tests for the `colored` feature.
+cargo test --all-features                                   # Runs the tests for all the features.
 ```
 
-You can also combine these commands to run more specific tests. For example, if you want to run the tests for the **colored**
-feature and display the output of the `println!` macros, you can use the following command:
+You can build the project using the following commands:
 
 ```sh
-cargo test --features colored -- --nocapture
+cargo doc --open                                            # Generates the documentation and opens it in the browser.
+cargo build                                                 # Builds the project in debug mode.
+cargo build --release                                       # Builds the project in release mode.
+cargo build --features colored                              # Builds the project with the `colored` feature.
+cargo build --all-features                                  # Builds the project with all the features.
 ```
 
-## Building the Project
-
-You can build the project using the following command:
-
-```sh
-cargo build
-```
-
-If you want to build the project in release mode, you can use the following command:
-
-```sh
-cargo build --release
-```
-
-If you want to build the project with the **colored** feature, you can use the following command:
-
-```sh
-cargo build --features colored
-```
-
-If you want to build the project with all the features, you can use the following command:
-
-```sh
-cargo build --all-features
-```
-
-You can also combine these commands to build the project with more specific configurations. For example, if you want to build
-the project with the **colored** feature in release mode, you can use the following command:
-
-```sh
-cargo build --features colored --release
-```
-
-## Potential New Features and Improvements
-
-There are several features and improvements that can be added to the Mabe project in the future. Some of these include:
-
-[ ] Finding a way to make it so that the **colored** feature can be used without the need for the user to add the [colored](https://crates.io/crates/colored)
-crate to their project and to import the [`Colorize`](https://docs.rs/colored/2.1.0/colored/trait.Colorize.html) trait where their
-error enums are defined.
-
-[ ] Creating macros that can be used on other error enums that were not defined by the user in order to retrieve the error, reason,
-and solution messages.
+If you want to know more about **Cargo**, you can check the [Cargo Documentation](https://doc.rust-lang.org/cargo).

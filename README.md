@@ -1,20 +1,33 @@
 # Mabe
 
-[**Mabe**](https://crates.io/crates/mabe) is a _Rust procedural macro crate_ that provides tools for creating simple and
-well-structured error enums for easy debugging. Each variant in the enum can have an error, reason, and solution message. This
-allows for a more detailed error handling and debugging process. Also, when an error is printed, the error, reason, and solution
-messages are displayed in a structured and readable format.
+[**Mabe**](https://crates.io/crates/mabe) is a simple framework for creating debug-friendly error enums in Rust. Each variant in
+the enum can include an error, reason, and solution message, and errors are displayed in a structured format, showing the
+messages defined for the variant. This allows for a more detailed and clear debugging process.
+
+## Table of Contents
+
+- [Getting Started](#getting-started)
+- [Examples](#examples)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Getting Started
 
-Add the following dependency to your `Cargo.toml` file:
+In order to use **Mabe** in your project, you need to add it as a dependency in your `Cargo.toml` file:
 
 ```toml
 [dependencies]
 mabe = "0.3"
 ```
 
-You can now use the `Mabe` derive macro and its attributes to create your own error enums as shown in the example below:
+You can now use the [`Mabe`](https://docs.rs/mabe/latest/mabe/derive.Mabe.html) derive macro and its attributes to create your
+own error enums by following the examples below.
+
+## Examples
+
+Here is a simple example of how to create a debug-friendly error enum:
+
+````rust
 
 ```rust
 use mabe::Mabe;
@@ -29,7 +42,7 @@ pub enum ServerError {
 
 let error = ServerError::Unauthorized;
 println!("{}", error);
-```
+````
 
 ```plaintext
 Output:
@@ -81,10 +94,10 @@ Output:
 This project is open to contributions and suggestions, and any help or feedback is highly appreciated. There is no code of
 conduct, but please be respectful and considerate when engaging with the community.
 
-The project follows the [Koseka Contribution Guidelines (Version 1.0)](https://koseka.org/contribution-guidelines/1.0) which
-provides standardized rules and guidelines for contributing to projects, so make sure to read this first before contributing to
-the project in any way. Additionally, you can also read the [DEVELOPMENT.md](DEVELOPMENT.md) file for more information on how
-the project is structured and what you can do to help.
+The project follows the [Koseka Contribution Guidelines](https://koseka.org/contribution-guidelines) which provides standardized
+rules and guidelines for contributing to projects, so make sure to read this first before contributing to the project in any
+way. Additionally, please refer to the [DEVELOPMENT](DEVELOPMENT.md) file for setup instructions and guidance on developing,
+testing, and building the project.
 
 Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in this project by you, shall be
 licensed as bellow, without any additional terms or conditions.

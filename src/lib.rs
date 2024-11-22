@@ -1,20 +1,18 @@
 // Copyright 2024 Amon Rayfa.
 // SPDX-License-Identifier: Apache-2.0.
 
-//! [**Mabe**](https://github.com/AmonRayfa/mabe) is a *procedural macro crate* that provides tools for creating simple and
-//! well-structured error enums for easy debugging. Each variant in the enum can have an error, reason, and solution message.
-//! This allows for a more detailed error handling and debugging process. Also, when an error is printed, the error, reason,
-//! and solution messages are displayed in a structured and easy-to-read format.
+//! [**Mabe**](https://github.com/AmonRayfa/mabe) is a simple framework for creating debug-friendly error enums in Rust. Each
+//! variant in the enum can include an error, reason, and solution message, and errors are displayed in a structured format,
+//! showing the messages defined for the variant. This allows for a more detailed and clear debugging process.
+//!
+//! Functionally, this crate is a _procedural macro_ that provides a derive macro called
+//! [`Mabe`](https://docs.rs/mabe/0.3.1/mabe/derive.Mabe.html), which is used to generate the debug-friendly error enums.
 //!
 //! # Examples
 //!
-//! Simple example of using the [`Mabe`](https://docs.rs/mabe/latest/mabe/derive.Mabe.html) derive macro:
+//! Here is a simple example of how to create a debug-friendly error enum:
 //!
-//! ```
-//! // Imports the `Colorize` trait only when the `colored` feature is enabled.
-//! #[cfg(feature = "colored")] // Remove this line when using the crate in a real project.
-//! use colored::Colorize;
-//!
+//! ```ignore
 //! use mabe::Mabe;
 //!
 //! #[derive(Debug, Mabe)]
@@ -38,11 +36,7 @@
 //!
 //! You can also interpolate the values of variant fields in the error, reason, and solution messages as shown below:
 //!
-//! ```
-//! // Imports the `Colorize` trait only when the `colored` feature is enabled.
-//! #[cfg(feature = "colored")] // Remove this line when using the crate in a real project.
-//! use colored::Colorize;
-//!
+//! ```ignore
 //! use mabe::Mabe;
 //!
 //! #[derive(Debug, Mabe)]
@@ -78,9 +72,17 @@
 //! [solution] Retry in 10 seconds.
 //! ```
 //!
-//! # Features
+//! # Cargo Features
 //!
-//! * **colored**: Adds colors to the prefixes of the error, reason, and solution messages (i.e. to `[error]`, `[reason]`, and `[solution]`) when they are printed. In order to use this feature, the [colored](https://crates.io/crates/colored) crate must be included in the dependencies of the project and the [`Colorize`](https://docs.rs/colored/latest/colored/trait.Colorize.html) trait must be imported where the error enums are defined.
+//! The following is a list of
+//! [Cargo features](https://doc.rust-lang.org/stable/cargo/reference/features.html#the-features-section) that can be enabled or
+//! disabled in the `Cargo.toml` file:
+//!
+//! * **colored**: Adds colors to the prefixes of the error, reason, and solution messages (i.e. to `[error]`, `[reason]`, and
+//!   `[solution]`) when they are printed. In order to use this feature, the [`colored`](https://crates.io/crates/colored) crate
+//!   must be included in the dependencies of the project and the
+//!   [`Colorize`](https://docs.rs/colored/latest/colored/trait.Colorize.html) trait must be imported where the error enums are
+//!   defined.
 
 extern crate proc_macro;
 mod utils;

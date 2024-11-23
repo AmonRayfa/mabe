@@ -1,4 +1,5 @@
 brace_style = "PreferSameLine"
+comment_width = 128
 edition = "2021"
 fn_single_line = true
 format_strings = true

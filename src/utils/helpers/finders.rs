@@ -52,8 +52,7 @@ pub fn find_active_right_brace<M: ToString>(msg: M, start: usize) -> Option<usiz
     }
 }
 
-/// Returns the index of the first element that matches the target in a vector.
-/// If no such string is found, `None` is returned.
+/// Returns the index of the first element that matches the target in a vector. If no such string is found, `None` is returned.
 pub fn find_target<T: ToString, E: ToString>(target: T, vec: &[E]) -> Option<usize> {
     vec.iter().position(|e| e.to_string() == target.to_string())
 }

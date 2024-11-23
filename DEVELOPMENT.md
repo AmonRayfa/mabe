@@ -87,7 +87,8 @@ All tests are located in the `src/tests/` directory and can be run using the fol
 
 ```sh
 cargo test                                                  # Runs all the tests in the project.
-cargo test unit_variants                                    # Runs the tests for the `unit_variants` module.
+cargo test --lib utils::helpers::tests                      # Runs the tests in the `tests` module of `utils/helpers/mod.rs`.
+cargo test --test unit_variants                             # Runs the tests in the `tests/unit_variants.rs` module.
 cargo test -- --nocapture                                   # Runs the tests and displays the output of the tests.
 cargo test --features color                                 # Runs the tests for the `color` feature.
 cargo test --all-features                                   # Runs the tests for all the features.

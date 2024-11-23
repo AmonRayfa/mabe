@@ -7,9 +7,8 @@ use proc_macro2::{Span, TokenStream};
 use quote::quote;
 use syn::{Ident, Lit, Meta, NestedMeta, Variant};
 
-/// A tool that returns the message of an attribute of a variant.
-/// The supported attributes are `error`, `reason`, and `solution`.
-/// If the attribute is not found, an empty string is returned.
+/// A tool that returns the message of an attribute of a variant. The supported attributes are `error`, `reason`, and
+/// `solution`. If the attribute is not found, an empty string is returned.
 pub fn get_attr_msg<A: ToString>(attribute: A, variant: &Variant) -> String {
     let attribute = attribute.to_string();
 
@@ -58,11 +57,10 @@ pub fn get_attr_msg<A: ToString>(attribute: A, variant: &Variant) -> String {
         .unwrap_or_else(String::new)
 }
 
-/// A tool that returns a tuple containing the formatted message and the extracted arguments
-/// as `String` and `Vec<String>` types respectively.
-/// In the formatted message, all single curly braces (i.e. curly braces that are not part of a placeholder),
-/// and all placeholders are replaced with generic placeholders (e.g. `{placeholder0}`, `{placeholder1}`, etc.).
-/// The replaced elements are stored in the extracted arguments vector.
+/// A tool that returns a tuple containing the formatted message and the extracted arguments as `String` and `Vec<String>` types
+/// respectively. In the formatted message, all single curly braces (i.e. curly braces that are not part of a placeholder), and
+/// all placeholders are replaced with generic placeholders (e.g. `{placeholder0}`, `{placeholder1}`, etc.). The replaced
+/// elements are stored in the extracted arguments vector.
 pub fn generic_format<M: ToString>(msg: M) -> (String, Vec<String>) {
     let msg = msg.to_string();
     let mut formatted_msg = String::new();
@@ -102,11 +100,10 @@ pub fn generic_format<M: ToString>(msg: M) -> (String, Vec<String>) {
     (formatted_msg, extracted_args)
 }
 
-/// A tool that returns a tuple containing the pattern bindings and the keyword arguments
-/// as `Vec<[TokenStream](proc_macro2::TokenStream)>` types.
-/// The pattern bindings are the fields of an enum variant and the keyword arguments are the placeholders and the extracted
-/// arguments.
-/// The `dunder` parameter is a boolean that determines whether the pattern bindings should have underscores at the beginning and end.
+/// A tool that returns a tuple containing the pattern bindings and the keyword arguments as
+/// [`Vec<TokenStream>`](proc_macro2::TokenStream) types. The pattern bindings are the fields of an enum variant and the keyword
+/// arguments are the placeholders and the extracted arguments. The `dunder` parameter is a boolean that determines whether the
+/// pattern bindings should have underscores at the beginning and end.
 pub fn pattern_map<A: ToString, F: ToString>(args: &[A], fields: &[F], dunder: bool) -> (Vec<TokenStream>, Vec<TokenStream>) {
     let args = args.iter().map(|a| a.to_string()).collect::<Vec<String>>();
     let fields = fields.iter().map(|f| f.to_string()).collect::<Vec<String>>();
@@ -140,7 +137,6 @@ pub fn pattern_map<A: ToString, F: ToString>(args: &[A], fields: &[F], dunder: b
     (pattern_bindings, keyword_args)
 }
 
-// Tests
 #[cfg(test)]
 mod tests {
     use super::*;

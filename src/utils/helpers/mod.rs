@@ -7,8 +7,10 @@ use proc_macro2::{Span, TokenStream};
 use quote::quote;
 use syn::{Ident, Lit, Meta, NestedMeta, Variant};
 
-/// A tool that returns the message of an attribute of a variant. The supported attributes are `error`, `reason`, and
-/// `solution`. If the attribute is not found, an empty string is returned.
+/// A tool that returns the message of the attribute of a variant. The supported attributes are `error`, `reason`, and
+/// `solution`. The function will panic in the following cases: if the attribute doesn't have exactly one argument, if the
+/// attribute is empty, if the argument of the attribute is not a `&str`, if the `error` attribute is not found, or if the
+/// attribute is found more than once.
 pub fn get_msg<A: ToString>(attribute: A, variant: &Variant) -> String {
     let attribute = attribute.to_string();
 
@@ -19,27 +21,36 @@ pub fn get_msg<A: ToString>(attribute: A, variant: &Variant) -> String {
         );
     }
 
-    variant
+    let filtered_attrs = variant
         .attrs
         .iter()
-        .rev()
         .filter_map(|attr| {
+            let mut msg = String::new();
+
             if let Ok(Meta::List(meta_list)) = attr.parse_meta() {
                 if let Some(attr_ident) = meta_list.path.get_ident() {
                     if *attr_ident == attribute {
                         if meta_list.nested.len() != 1 {
                             panic!(
-                                "Expected 1 argument for the `#[{}]` attribute of the `{}` variant, found {}.",
+                                "Expected 1 argument for the `{}` attribute of the `{}` variant, found {}.",
                                 attribute,
                                 variant.ident,
                                 meta_list.nested.len()
                             );
                         }
+
                         if let NestedMeta::Lit(Lit::Str(lit_str)) = &meta_list.nested[0] {
-                            return Some(lit_str.value());
+                            if lit_str.value().is_empty() {
+                                panic!(
+                                    "The `{}` attribute of the `{}` variant cannot be empty. When an attribute is present, it must contain a message.",
+                                    attribute, variant.ident
+                                );
+                            }
+
+                            msg = lit_str.value();
                         } else {
                             panic!(
-                                "Expected a `&str` argument for the `#[{}]` attribute of the `{}` variant.",
+                                "Expected a `&str` argument for the `{}` attribute of the `{}` variant.",
                                 attribute, variant.ident
                             );
                         }
@@ -51,10 +62,28 @@ pub fn get_msg<A: ToString>(attribute: A, variant: &Variant) -> String {
                     variant.ident
                 );
             }
-            None
+
+            if msg.is_empty() {
+                None
+            } else {
+                Some(msg)
+            }
         })
-        .find(|_| true)
-        .unwrap_or_else(String::new)
+        .collect::<Vec<String>>();
+
+    if filtered_attrs.is_empty() && attribute == "error" {
+        panic!("The `error` attribute is required for the `{}` variant.", variant.ident);
+    }
+
+    if filtered_attrs.len() > 1 {
+        panic!("The `{}` attribute of the `{}` variant can only be used once.", attribute, variant.ident);
+    }
+
+    if filtered_attrs.is_empty() {
+        String::new()
+    } else {
+        filtered_attrs[0].clone()
+    }
 }
 
 /// A tool that returns a tuple containing the formatted message and the extracted arguments as `String` and `Vec<String>` types

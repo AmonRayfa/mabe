@@ -90,7 +90,7 @@ cargo test                                                  # Runs all the tests
 cargo test --lib utils::helpers::tests                      # Runs the tests in the `tests` module of `utils/helpers/mod.rs`.
 cargo test --test unit_variants                             # Runs the tests in the `tests/unit_variants.rs` module.
 cargo test -- --nocapture                                   # Runs the tests and displays the output of the tests.
-cargo test --features color                                 # Runs the tests for the `color` feature.
+cargo test --features colorize                              # Runs the tests for the `colorize` feature.
 cargo test --all-features                                   # Runs the tests for all the features.
 ```
 
@@ -100,7 +100,7 @@ You can build the project using the following commands:
 cargo doc --open                                            # Generates the documentation and opens it in the browser.
 cargo build                                                 # Builds the project in debug mode.
 cargo build --release                                       # Builds the project in release mode.
-cargo build --features color                                # Builds the project with the `color` feature.
+cargo build --features colorize                             # Builds the project with the `colorize` feature.
 cargo build --all-features                                  # Builds the project with all the features.
 ```
 

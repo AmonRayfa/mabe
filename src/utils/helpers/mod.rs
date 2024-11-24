@@ -9,12 +9,12 @@ use syn::{Ident, Lit, Meta, NestedMeta, Variant};
 
 /// A tool that returns the message of an attribute of a variant. The supported attributes are `error`, `reason`, and
 /// `solution`. If the attribute is not found, an empty string is returned.
-pub fn get_attr_msg<A: ToString>(attribute: A, variant: &Variant) -> String {
+pub fn get_msg<A: ToString>(attribute: A, variant: &Variant) -> String {
     let attribute = attribute.to_string();
 
     if attribute != "error" && attribute != "reason" && attribute != "solution" {
         panic!(
-            "The `#[{}]` attribute is not supported, supported attributes are `error`, `reason`, and `solution`. This error should not be able to occur in production code. Try reloading the window. If the problem persists, report the issue to the crate's [GitHub repository](https://github.com/AmonRayfa/mabe).",
+            "The `utils::helpers::get_msg` function only supports the `error`, `reason`, and `solution` attributes, found `{}`. This error should not be able to occur in production code. Try reloading the window. If the problem persists, report the issue to the crate's [GitHub repository](https://github.com/AmonRayfa/mabe).",
             attribute
         );
     }
@@ -61,7 +61,7 @@ pub fn get_attr_msg<A: ToString>(attribute: A, variant: &Variant) -> String {
 /// respectively. In the formatted message, all single curly braces (i.e. curly braces that are not part of a placeholder), and
 /// all placeholders are replaced with generic placeholders (e.g. `{placeholder0}`, `{placeholder1}`, etc.). The replaced
 /// elements are stored in the extracted arguments vector.
-pub fn generic_format<M: ToString>(msg: M) -> (String, Vec<String>) {
+pub fn format_msg<M: ToString>(msg: M) -> (String, Vec<String>) {
     let msg = msg.to_string();
     let mut formatted_msg = String::new();
     let mut extracted_args = Vec::<String>::new();
@@ -104,7 +104,7 @@ pub fn generic_format<M: ToString>(msg: M) -> (String, Vec<String>) {
 /// [`Vec<TokenStream>`](proc_macro2::TokenStream) types. The pattern bindings are the fields of an enum variant and the keyword
 /// arguments are the placeholders and the extracted arguments. The `dunder` parameter is a boolean that determines whether the
 /// pattern bindings should have underscores at the beginning and end.
-pub fn pattern_map<A: ToString, F: ToString>(args: &[A], fields: &[F], dunder: bool) -> (Vec<TokenStream>, Vec<TokenStream>) {
+pub fn map_args<A: ToString, F: ToString>(args: &[A], fields: &[F], dunder: bool) -> (Vec<TokenStream>, Vec<TokenStream>) {
     let args = args.iter().map(|a| a.to_string()).collect::<Vec<String>>();
     let fields = fields.iter().map(|f| f.to_string()).collect::<Vec<String>>();
 
@@ -137,63 +137,86 @@ pub fn pattern_map<A: ToString, F: ToString>(args: &[A], fields: &[F], dunder: b
     (pattern_bindings, keyword_args)
 }
 
+// A tool that returns a styled prefix for the error, reason, and solution attributes using ANSI escape codes. The `colorize`
+// feature must be enabled for this function to work.
+pub fn style_prefix<A: ToString>(attribute: A) -> String {
+    let attribute = attribute.to_string();
+
+    if attribute != "error" && attribute != "reason" && attribute != "solution" {
+        panic!("The `utils::helper::style_prefix` function only supports the `error`, `reason`, and `solution` attributes, found `{}`. This error should not be able to occur in production code. Try reloading the window. If the problem persists, report the issue to the crate's [GitHub repository](https://github.com/AmonRayfa/mabe).",
+            attribute
+        );
+    }
+
+    #[cfg(feature = "colorize")]
+    match attribute.as_str() {
+        "error" => return "\u{1b}[1;31m[error]\u{1b}[0m".to_string(), // ANSI escape code for red and bold text.
+        "reason" => return "\u{1b}[1;33m[reason]\u{1b}[0m".to_string(), // ANSI escape code for yellow and bold text.
+        "solution" => return "\u{1b}[1;32m[solution]\u{1b}[0m".to_string(), // ANSI escape code for green and bold text.
+        _ => return String::new(),                                    // This should never be reached.
+    };
+
+    #[cfg(not(feature = "colorize"))]
+    return format!("[{}]", attribute);
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_generic_format() {
+    fn test_format_msg() {
         // Example 1: Even number of curly braces.
         let msg1 = "The placeholders are: {x}, {{y}} and {z}.".to_string();
-        let (formatted_msg1, extracted_args_msg1) = generic_format(msg1);
+        let (formatted_msg1, extracted_args_msg1) = format_msg(msg1);
         assert_eq!(formatted_msg1, "The placeholders are: {placeholder0}, {{y}} and {placeholder1}.");
         assert_eq!(extracted_args_msg1, vec!["x".to_string(), "z".to_string()]);
 
         // Example 2: Uneven number of curly braces.
         let msg2 = "The placeholders are: {x}, {{{y}}} and {z}}}.".to_string();
-        let (formatted_msg2, extracted_args_msg2) = generic_format(msg2);
+        let (formatted_msg2, extracted_args_msg2) = format_msg(msg2);
         assert_eq!(formatted_msg2, "The placeholders are: {placeholder0}, {{{placeholder1}}} and {placeholder2}}}.");
         assert_eq!(extracted_args_msg2, vec!["x".to_string(), "y".to_string(), "z".to_string()]);
 
         // Example 3: Even number of curly braces.
         let msg3 = "The placeholders are: {{x}}, {{{{y}}}} and {{{{z}}.".to_string();
-        let (formatted_msg3, extracted_args_msg3) = generic_format(msg3);
+        let (formatted_msg3, extracted_args_msg3) = format_msg(msg3);
         assert_eq!(formatted_msg3, "The placeholders are: {{x}}, {{{{y}}}} and {{{{z}}.");
         assert_eq!(extracted_args_msg3, Vec::<String>::new());
 
         // Example 4: Empty curly braces.
         let msg4 = "The placeholders are: {}, {{}}}} and {{{ }.".to_string();
-        let (formatted_msg4, extracted_args_msg4) = generic_format(msg4);
+        let (formatted_msg4, extracted_args_msg4) = format_msg(msg4);
         assert_eq!(formatted_msg4, "The placeholders are: {placeholder0}, {{}}}} and {{{placeholder1}.");
         assert_eq!(extracted_args_msg4, vec!["".to_string(), " ".to_string()]);
 
         // Example 5: Unbalanced curly braces.
         let msg5 = "The placeholders are: {x}}, {y} and z.".to_string();
-        let (formatted_msg5, extracted_args_msg5) = generic_format(msg5);
+        let (formatted_msg5, extracted_args_msg5) = format_msg(msg5);
         assert_eq!(formatted_msg5, "The placeholders are: {placeholder0} and z.");
         assert_eq!(extracted_args_msg5, vec!["x}}, {y".to_string()]);
     }
 
     #[test]
-    fn test_pattern_map() {
+    fn test_map_args() {
         // Example 1: Empty `args` and `fields` vector.
         let args1 = Vec::<String>::new();
         let fields1 = Vec::<String>::new();
-        let (pattern_bindings1, keyword_args1) = pattern_map(&args1, &fields1, true);
+        let (pattern_bindings1, keyword_args1) = map_args(&args1, &fields1, true);
         assert_eq!(quote! {[#(#pattern_bindings1),*]}.to_string(), "[]");
         assert_eq!(quote! {[#(#keyword_args1),*]}.to_string(), "[]");
 
         // Example 2: Empty `args` vector.
         let args2 = Vec::<String>::new();
         let fields2 = vec!["x".to_string(), "y".to_string(), "z".to_string()];
-        let (pattern_bindings2, keyword_args2) = pattern_map(&args2, &fields2, true);
+        let (pattern_bindings2, keyword_args2) = map_args(&args2, &fields2, true);
         assert_eq!(quote! {[#(#pattern_bindings2),*]}.to_string(), "[_x_ , _y_ , _z_]");
         assert_eq!(quote! {[#(#keyword_args2),*]}.to_string(), "[]");
 
         // Example 3: Empty `fields` vector.
         let args3 = vec!["x".to_string(), "y".to_string(), "z".to_string()];
         let fields3 = Vec::<String>::new();
-        let (pattern_bindings3, keyword_args3) = pattern_map(&args3, &fields3, true);
+        let (pattern_bindings3, keyword_args3) = map_args(&args3, &fields3, true);
         assert_eq!(quote! {[#(#pattern_bindings3),*]}.to_string(), "[]");
         assert_eq!(
             quote! {[#(#keyword_args3),*]}.to_string(),
@@ -203,7 +226,7 @@ mod tests {
         // Example 4: Non-empty `args` and `fields` vector.
         let args4 = vec!["x".to_string(), "y".to_string(), "z".to_string()];
         let fields4 = vec!["x".to_string(), "y".to_string()];
-        let (pattern_bindings4, keyword_args4) = pattern_map(&args4, &fields4, false);
+        let (pattern_bindings4, keyword_args4) = map_args(&args4, &fields4, false);
         assert_eq!(quote! {[#(#pattern_bindings4),*]}.to_string(), "[x , y]");
         assert_eq!(quote! {[#(#keyword_args4),*]}.to_string(), "[placeholder0 = x , placeholder1 = y , placeholder2 = \"z\"]");
     }

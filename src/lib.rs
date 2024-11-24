@@ -12,7 +12,7 @@
 //!
 //! Here is a simple example of how to create a debug-friendly error enum:
 //!
-//! ```ignore
+//! ```
 //! use mabe::Mabe;
 //!
 //! #[derive(Mabe)]
@@ -36,7 +36,7 @@
 //!
 //! You can also interpolate the values of variant fields in the error, reason, and solution messages as shown below:
 //!
-//! ```ignore
+//! ```
 //! use mabe::Mabe;
 //!
 //! #[derive(Mabe)]
@@ -78,11 +78,8 @@
 //! [Cargo features](https://doc.rust-lang.org/stable/cargo/reference/features.html#the-features-section) that can be enabled or
 //! disabled in the `Cargo.toml` file:
 //!
-//! * **color**: Adds colors to the prefixes of the error, reason, and solution messages (i.e. to `[error]`, `[reason]`, and
-//!   `[solution]`) when they are printed. In order to use this feature, the [`colored`](https://crates.io/crates/colored) crate
-//!   must be included in the dependencies of the project and the
-//!   [`Colorize`](https://docs.rs/colored/latest/colored/trait.Colorize.html) trait must be imported where the error enums are
-//!   defined.
+//! * **colorize**: Adds colors to the prefixes of the error, reason, and solution messages (i.e. to `[error]`, `[reason]`, and
+//!   `[solution]`) when they are printed. This feature only works with ANSI-compatible terminals.
 
 extern crate proc_macro;
 mod utils;
@@ -115,18 +112,18 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
             let variant_ident = &variant.ident;
 
             let mut debug_msg = format!("{}::{}", enum_ident, variant_ident);
-            let (error_msg, error_args) = generic_format(get_attr_msg("error", variant));
-            let (reason_msg, reason_args) = generic_format(get_attr_msg("reason", variant));
-            let (solution_msg, solution_args) = generic_format(get_attr_msg("solution", variant));
+            let (error_msg, error_args) = format_msg(get_msg("error", variant));
+            let (reason_msg, reason_args) = format_msg(get_msg("reason", variant));
+            let (solution_msg, solution_args) = format_msg(get_msg("solution", variant));
 
             // Generates the match arms for the variant based on the type of fields it contains.
             match &variant.fields {
                 Fields::Unit => {
                     let fields = Vec::<String>::new();
 
-                    let (_, error_keyword_args) = pattern_map(&error_args, &fields, true);
-                    let (_, reason_keyword_args) = pattern_map(&reason_args, &fields, true);
-                    let (_, solution_keyword_args) = pattern_map(&solution_args, &fields, true);
+                    let (_, error_keyword_args) = map_args(&error_args, &fields, true);
+                    let (_, reason_keyword_args) = map_args(&reason_args, &fields, true);
+                    let (_, solution_keyword_args) = map_args(&solution_args, &fields, true);
 
                     debug_match_arms.push(quote! {
                         Self::#variant_ident => format!(#debug_msg),
@@ -161,12 +158,12 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
                     }
 
                     debug_msg.push(')');
-                    let (debug_msg, debug_args) = generic_format(&debug_msg);
+                    let (debug_msg, debug_args) = format_msg(&debug_msg);
 
-                    let (debug_pattern_bindings, debug_keyword_args) = pattern_map(&debug_args, &fields, true);
-                    let (error_pattern_bindings, error_keyword_args) = pattern_map(&error_args, &fields, true);
-                    let (reason_pattern_bindings, reason_keyword_args) = pattern_map(&reason_args, &fields, true);
-                    let (solution_pattern_bindings, solution_keyword_args) = pattern_map(&solution_args, &fields, true);
+                    let (debug_pattern_bindings, debug_keyword_args) = map_args(&debug_args, &fields, true);
+                    let (error_pattern_bindings, error_keyword_args) = map_args(&error_args, &fields, true);
+                    let (reason_pattern_bindings, reason_keyword_args) = map_args(&reason_args, &fields, true);
+                    let (solution_pattern_bindings, solution_keyword_args) = map_args(&solution_args, &fields, true);
 
                     debug_match_arms.push(quote! {
                         Self::#variant_ident(#(#debug_pattern_bindings),*) => format!(#debug_msg, #(#debug_keyword_args),*),
@@ -183,15 +180,14 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
                 }
                 Fields::Named(fields) => {
                     let fields = fields.named
-                    .iter()
-                    .map(|f| {
-                        f.ident
-                            .clone()
-                            .unwrap_or_else(|| panic!("Failed to retrieve the identifier of a named field in the `{}` variant. This error should not be possible, try reloading the window. If the problem persists, report the issue to the crate's [GitHub repository](https://github.com/AmonRayfa/mabe).", variant_ident))
-                            .to_string()
-                    })
-                    .collect::<Vec<String>>();
-
+                        .iter()
+                        .map(|f| {
+                            f.ident
+                                .clone()
+                                .unwrap_or_else(|| panic!("Failed to retrieve the identifier of a named field in the `{}` variant. This error should not be possible, try reloading the window. If the problem persists, report the issue to the crate's [GitHub repository](https://github.com/AmonRayfa/mabe).", variant_ident))
+                                .to_string()
+                        })
+                        .collect::<Vec<String>>();
                     debug_msg.push_str(" {{ ");
 
                     for (i, f) in fields.iter().enumerate() {
@@ -210,12 +206,12 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
                     }
 
                     debug_msg.push_str("}}");
-                    let (debug_msg, debug_args) = generic_format(&debug_msg);
+                    let (debug_msg, debug_args) = format_msg(&debug_msg);
 
-                    let (debug_pattern_bindings, debug_keyword_args) = pattern_map(&debug_args, &fields, false);
-                    let (error_pattern_bindings, error_keyword_args) = pattern_map(&error_args, &fields, false);
-                    let (reason_pattern_bindings, reason_keyword_args) = pattern_map(&reason_args, &fields, false);
-                    let (solution_pattern_bindings, solution_keyword_args) = pattern_map(&solution_args, &fields, false);
+                    let (debug_pattern_bindings, debug_keyword_args) = map_args(&debug_args, &fields, false);
+                    let (error_pattern_bindings, error_keyword_args) = map_args(&error_args, &fields, false);
+                    let (reason_pattern_bindings, reason_keyword_args) = map_args(&reason_args, &fields, false);
+                    let (solution_pattern_bindings, solution_keyword_args) = map_args(&solution_args, &fields, false);
 
                     debug_match_arms.push(quote! {
                         Self::#variant_ident { #(#debug_pattern_bindings),* } => format!(#debug_msg, #(#debug_keyword_args),*),
@@ -238,12 +234,26 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
 
     let write_debug = quote! { write!(f, "{}", self.debug()) };
 
-    #[cfg(feature = "color")]
-    let write_display = quote! { write!(f, "\n{} {}\n{} {}\n{} {}", "[error]".red().bold(), self.error(), "[reason]".yellow().bold(), self.reason(), "[solution]".green().bold(), self.solution()) };
+    let error_prefix = style_prefix("error");
+    let reason_prefix = style_prefix("reason");
+    let solution_prefix = style_prefix("solution");
 
-    #[cfg(not(feature = "color"))]
-    let write_display =
-        quote! { write!(f, "\n[error] {}\n[reason] {}\n[solution] {}", self.error(), self.reason(), self.solution()) };
+    let write_display = quote! {
+        let mut error = match self.error().as_str() {
+            "" => "".to_string(),
+            e => format!("\n{} {}", #error_prefix, e),
+        };
+        let mut reason = match self.reason().as_str() {
+            "" => "".to_string(),
+            r => format!("\n{} {}", #reason_prefix, r),
+        };
+        let mut solution = match self.solution().as_str() {
+            "" => "".to_string(),
+            s => format!("\n{} {}", #solution_prefix, s),
+        };
+
+        write!(f, "{}{}{}", error, reason, solution)
+    };
 
     let implementations = quote! {
         impl #enum_ident {

@@ -17,7 +17,7 @@ In order to use **Mabe** in your project, you need to add it as a dependency in 
 
 ```toml
 [dependencies]
-mabe = "0.3"
+mabe = "0.4"
 ```
 
 You can now use the [`Mabe`](https://docs.rs/mabe/latest/mabe/derive.Mabe.html) derive macro and its attributes to create your
@@ -26,8 +26,6 @@ own error enums by following the examples below.
 ## Examples
 
 Here is a simple example of how to create a debug-friendly error enum:
-
-````rust
 
 ```rust
 use mabe::Mabe;
@@ -42,7 +40,7 @@ pub enum ServerError {
 
 let error = ServerError::Unauthorized;
 println!("{}", error);
-````
+```
 
 ```plaintext
 Output:

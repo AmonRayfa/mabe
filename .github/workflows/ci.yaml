@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+
+      - name: Install cross
+        run: cargo install cross
+
+      - name: Ensure Docker is running
+        run: sudo systemctl start docker
+
+      - name: Build and test for x86_64-unknown-linux-gnu
+        run: |
+          cross build --target x86_64-unknown-linux-gnu --verbose
+          cross test --target x86_64-unknown-linux-gnu --verbose
+
+      - name: Build and test for aarch64-unknown-linux-gnu
+        run: |
+          cross build --target aarch64-unknown-linux-gnu --verbose
+          cross test --target aarch64-unknown-linux-gnu --verbose
+
+      - name: Build and test for x86_64-pc-windows-gnu
+        run: |
+          cross build --target x86_64-pc-windows-gnu --verbose
+          cross test --target x86_64-pc-windows-gnu --verbose
+
+      - name: Build and test for x86_64-apple-darwin
+        run: |
+          cross build --target x86_64-apple-darwin --verbose
+          cross test --target x86_64-apple-darwin --verbose

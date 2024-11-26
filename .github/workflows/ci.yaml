@@ -24,7 +24,6 @@ jobs:
         with:
           toolchain: stable
           override: true
-          profile: minimal
 
       - name: Install cross
         run: cargo install cross

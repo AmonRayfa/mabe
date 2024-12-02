@@ -15,11 +15,50 @@ env:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        target:
+          # Linux
+          - aarch64-unknown-linux-gnu
+          - armv7-unknown-linux-gnueabihf
+          - i686-unknown-linux-gnu
+          - mips-unknown-linux-gnu
+          - mips64-unknown-linux-gnuabi64
+          - x86_64-unknown-linux-gnu
+
+          # macOS
+          - aarch64-apple-darwin
+          - x86_64-apple-darwin
+
+          # Windows
+          - aarch64-pc-windows-msvc
+          - armv7-pc-windows-msvc
+          - i686-pc-windows-gnu
+          - i686-pc-windows-msvc
+          - x86_64-pc-windows-gnu
+          - x86_64-pc-windows-msvc
+
+          # Android
+          - aarch64-linux-android
+          - armv7-linux-androideabi
+          - i686-linux-android
+          - x86_64-linux-android
+
+          # iOS
+          - aarch64-apple-ios
+          - aarch64-apple-ios-sim
+          - x86_64-apple-ios
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install cross
+        run: cargo install cross
+
       - name: Build
-        run: cargo build --verbose
+        run: cross build --target ${{ matrix.target }} --verbose
+
       - name: Run tests
-        run: cargo test --verbose
+        run: cross test --target ${{ matrix.target }} --verbose

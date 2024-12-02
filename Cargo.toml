@@ -15,6 +15,7 @@ exclude = [
   "node_modules/**",
   "target/**",
   ".gitignore",
+  "generated_implementations.log",
   "package.json",
   "pnpm-lock.yaml",
 ]

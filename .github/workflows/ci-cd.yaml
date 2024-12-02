@@ -19,11 +19,5 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: List files
-        run: ls -R
-      - name: Build
-        run: cargo build --verbose
-      - name: List files
-        run: ls -R
       - name: Run tests
         run: cargo test --verbose

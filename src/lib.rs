@@ -282,7 +282,7 @@ pub fn mabe_derive(input: TokenStream) -> TokenStream {
     };
 
     #[cfg(debug_assertions)]
-    write_implementations(&implementations, "./logs/generated_implementations.txt");
+    write_implementations(&implementations, "./generated_implementations.log");
 
     TokenStream::from(implementations)
 }

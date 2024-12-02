@@ -17,7 +17,7 @@ In order to use **Mabe** in your project, you need to add it as a dependency in 
 
 ```toml
 [dependencies]
-mabe = "0.4"
+mabe = "1"
 ```
 
 You can now use the [`Mabe`](https://docs.rs/mabe/latest/mabe/derive.Mabe.html) derive macro and its attributes to create your

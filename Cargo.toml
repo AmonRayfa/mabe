@@ -1,6 +1,6 @@
 [package]
 name = "mabe"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2021"
 authors = ["Amon Rayfa <amon.rayfa@proton.me>"]
 description = "A simple framework for creating debug-friendly error enums in Rust."
@@ -11,6 +11,7 @@ repository = "https://github.com/AmonRayfa/mabe"
 license = "Apache-2.0"
 readme = "README.md"
 exclude = [
+  ".github/**",
   ".trunk/**",
   "node_modules/**",
   "target/**",

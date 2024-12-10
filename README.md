@@ -1,8 +1,8 @@
 # Mabe
 
 [**Mabe**](https://crates.io/crates/mabe) is a simple framework for creating debug-friendly error enums in Rust. Each variant in
-the enum can include an error, reason, and solution message, and errors are displayed in a structured format, showing the
-messages defined for the variant. This allows for a more detailed and clear debugging process.
+the enum can include an error, cause, and debug message, and errors are displayed in a structured format, showing the messages
+defined for the variant. This allows for a more detailed and clear debugging process.
 
 ## Table of Contents
 
@@ -33,8 +33,8 @@ use mabe::Mabe;
 #[derive(Mabe)]
 pub enum ServerError {
     #[error("You are not authorized to access this resource.")]
-    #[reason("Your account does not have the required permissions.")]
-    #[solution("Try using a different account.")]
+    #[cause("Your account does not have the required permissions.")]
+    #[debug("Try using a different account.")]
     Unauthorized,
 }
 
@@ -45,11 +45,11 @@ println!("{}", error);
 ```plaintext
 Output:
 [error] You are not authorized to access this resource.
-[reason] Your account does not have the required permissions.
-[solution] Try using a different account.
+[cause] Your account does not have the required permissions.
+[debug] Try using a different account.
 ```
 
-You can also interpolate the values of variant fields in the error, reason, and solution messages as shown below:
+You can also interpolate the values of variant fields in the error, cause, and debug messages as shown below:
 
 ```rust
 use mabe::Mabe;
@@ -57,34 +57,33 @@ use mabe::Mabe;
 #[derive(Mabe)]
 pub enum ServerError {
     #[error("Network failure.")]
-    // Interpolates the values of the 1st and 2nd field in the reason message.
-    #[reason("Code {0}: {1}.")]
+    // Interpolates the values of the 1st and 2nd field in the cause message.
+    #[cause("Code {0}: {1}.")]
     NetworkFailure(u32, String),
 
     #[error("Connection lost.")]
-    // Interpolates the value of the `reason` field in the reason message.
-    #[reason("{reason}")]
-    // Interpolates the value of the `retry_in` field in the solution message.
-    #[solution("Retry in {retry_in} seconds.")]
-    ConnectionLost { reason: String, retry_in: u32 }
+    // Interpolates the value of the `cause` field in the cause message.
+    #[cause("{cause}")]
+    // Interpolates the value of the `retry_in` field in the debug message.
+    #[debug("Retry in {retry_in} seconds.")]
+    ConnectionLost { cause: String, retry_in: u32 }
 }
 
 let error1 = ServerError::NetworkFailure(404, "Not Found".to_string());
 println!("{}", error1);
 
-let error2 = ServerError::ConnectionLost { reason: "Server down".to_string(), retry_in: 10 };
+let error2 = ServerError::ConnectionLost { cause: "Server down".to_string(), retry_in: 10 };
 println!("{}", error2);
 ```
 
 ```plaintext
 Output:
 [error] Network failure.
-[reason] Code 404: Not Found.
-[solution]
+[cause] Code 404: Not Found.
 
 [error] Connection lost.
-[reason] Server down.
-[solution] Retry in 10 seconds.
+[cause] Server down.
+[debug] Retry in 10 seconds.
 ```
 
 ## Contributing

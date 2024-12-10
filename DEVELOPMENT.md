@@ -21,9 +21,9 @@ from the official websites: [node.js](https://nodejs.org) and [pnpm](https://pnp
 Next, clone the `mabe` repository to your local machine and install the development dependencies:
 
 ```sh
-git clone https://github.com/AmonRayfa/mabe.git             # Clones the repository.
-cd mabe                                                     # Moves into the project directory.
-pnpm install                                                # Installs the development dependencies.
+git clone https://github.com/AmonRayfa/mabe.git           # Clones the repository.
+cd mabe                                                   # Moves into the project directory.
+pnpm install                                              # Installs the development dependencies.
 ```
 
 Since **Trunk** is used for formatting the code, it's best if you disable the _format on save_ option in your editor to avoid
@@ -68,15 +68,15 @@ pnpm trunk git-hooks sync
 You can manually run the linters and formatters using the following commands:
 
 ```sh
-pnpm trunk check                                            # Runs linters and formatters on all the changed files.
-pnpm trunk check --all                                      # Runs linters and formatters on all the files in the repository.
+pnpm trunk check                                          # Runs linters and formatters on all the changed files.
+pnpm trunk check --all                                    # Runs linters and formatters on all the files in the repository.
 ```
 
 You can manually format the code using the following commands:
 
 ```sh
-pnpm trunk fmt                                              # Formats all the changed files.
-pnpm trunk fmt --all                                        # Formats all the files in the repository.
+pnpm trunk fmt                                            # Formats all the changed files.
+pnpm trunk fmt --all                                      # Formats all the files in the repository.
 ```
 
 If you want to know more about **Trunk**, you can check the [Trunk Documentation](https://docs.trunk.io).
@@ -86,22 +86,22 @@ If you want to know more about **Trunk**, you can check the [Trunk Documentation
 All tests are located in the `src/tests/` directory and can be run using the following commands:
 
 ```sh
-cargo test                                                  # Runs all the tests in the project.
-cargo test --lib utils::helpers::tests                      # Runs the tests in the `tests` module of `utils/helpers/mod.rs`.
-cargo test --test unit_variants                             # Runs the tests in the `tests/unit_variants.rs` module.
-cargo test -- --nocapture                                   # Runs the tests and displays the output of the tests.
-cargo test --features colorize                              # Runs the tests for the `colorize` feature.
-cargo test --all-features                                   # Runs the tests for all the features.
+cargo test                                                # Runs all the tests in the project.
+cargo test -- --nocapture                                 # Runs all the tests in the project and displays their output.
+cargo test --lib utils::helpers::tests                    # Runs the tests in the `tests` module of `src/utils/helpers/mod.rs`.
+cargo test --test unit_variants                           # Runs the tests in `tests/unit_variants.rs`.
+cargo test --features colorize                            # Runs all the tests in the project for the `colorize` feature.
+cargo test --all-features                                 # Runs all the tests in the project for all the features.
 ```
 
 You can build the project using the following commands:
 
 ```sh
-cargo doc --open                                            # Generates the documentation and opens it in the browser.
-cargo build                                                 # Builds the project in debug mode.
-cargo build --release                                       # Builds the project in release mode.
-cargo build --features colorize                             # Builds the project with the `colorize` feature.
-cargo build --all-features                                  # Builds the project with all the features.
+cargo doc --open                                          # Generates the Rust documentation and opens it in the browser.
+cargo build                                               # Builds the project in debug mode.
+cargo build --release                                     # Builds the project in release mode.
+cargo build --features colorize                           # Builds the project with the `colorize` feature.
+cargo build --all-features                                # Builds the project with all the features.
 ```
 
 If you want to know more about **Cargo**, you can check the [Cargo Documentation](https://doc.rust-lang.org/cargo).

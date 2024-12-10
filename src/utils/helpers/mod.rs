@@ -7,16 +7,16 @@ use proc_macro2::{Span, TokenStream};
 use quote::quote;
 use syn::{Ident, Lit, Meta, NestedMeta, Variant};
 
-/// A tool that returns the message of the attribute of a variant. The supported attributes are `error`, `reason`, and
-/// `solution`. The function will panic in the following cases: if the attribute doesn't have exactly one argument, if the
+/// A tool that returns the message of the attribute of a variant. The supported attributes are `error`, `cause`, and
+/// `debug`. The function will panic in the following cases: if the attribute doesn't have exactly one argument, if the
 /// attribute is empty, if the argument of the attribute is not a `&str`, if the `error` attribute is not found, or if the
 /// attribute is found more than once.
 pub fn get_msg<A: ToString>(attribute: A, variant: &Variant) -> String {
     let attribute = attribute.to_string();
 
-    if attribute != "error" && attribute != "reason" && attribute != "solution" {
+    if attribute != "error" && attribute != "cause" && attribute != "debug" {
         panic!(
-            "The `utils::helpers::get_msg` function only supports the `error`, `reason`, and `solution` attributes, found `{}`. This error should not be able to occur in production code. Try reloading the window. If the problem persists, report the issue to the crate's [GitHub repository](https://github.com/AmonRayfa/mabe).",
+            "The `utils::helpers::get_msg` function only supports the `error`, `cause`, and `debug` attributes, found `{}`. This error should not be able to occur in production code. Try reloading the window. If the problem persists, report the issue to the crate's [GitHub repository](https://github.com/AmonRayfa/mabe).",
             attribute
         );
     }
@@ -166,13 +166,13 @@ pub fn map_args<A: ToString, F: ToString>(args: &[A], fields: &[F], dunder: bool
     (pattern_bindings, keyword_args)
 }
 
-// A tool that returns a styled prefix for the error, reason, and solution attributes using ANSI escape codes. The `colorize`
-// feature must be enabled for this function to work.
+/// A tool that returns a styled prefix for the `error`, `cause`, and `debug` attributes using ANSI escape codes. The `colorize`
+/// feature must be enabled for this function to work.
 pub fn style_prefix<A: ToString>(attribute: A) -> String {
     let attribute = attribute.to_string();
 
-    if attribute != "error" && attribute != "reason" && attribute != "solution" {
-        panic!("The `utils::helper::style_prefix` function only supports the `error`, `reason`, and `solution` attributes, found `{}`. This error should not be able to occur in production code. Try reloading the window. If the problem persists, report the issue to the crate's [GitHub repository](https://github.com/AmonRayfa/mabe).",
+    if attribute != "error" && attribute != "cause" && attribute != "debug" {
+        panic!("The `utils::helper::style_prefix` function only supports the `error`, `cause`, and `debug` attributes, found `{}`. This error should not be able to occur in production code. Try reloading the window. If the problem persists, report the issue to the crate's [GitHub repository](https://github.com/AmonRayfa/mabe).",
             attribute
         );
     }
@@ -180,8 +180,8 @@ pub fn style_prefix<A: ToString>(attribute: A) -> String {
     #[cfg(feature = "colorize")]
     match attribute.as_str() {
         "error" => return "\u{1b}[1;31m[error]\u{1b}[0m".to_string(), // ANSI escape code for red and bold text.
-        "reason" => return "\u{1b}[1;33m[reason]\u{1b}[0m".to_string(), // ANSI escape code for yellow and bold text.
-        "solution" => return "\u{1b}[1;32m[solution]\u{1b}[0m".to_string(), // ANSI escape code for green and bold text.
+        "cause" => return "\u{1b}[1;33m[cause]\u{1b}[0m".to_string(), // ANSI escape code for yellow and bold text.
+        "debug" => return "\u{1b}[1;32m[debug]\u{1b}[0m".to_string(), // ANSI escape code for green and bold text.
         _ => return String::new(),                                    // This should never be reached.
     };
 

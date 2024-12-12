@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 
 mod helpers;
+use crate::error::api::derive_macro::Error;
 use helpers::*;
 use proc_macro::TokenStream;
 use quote::quote;
@@ -23,7 +24,7 @@ pub fn mabe(input: TokenStream) -> TokenStream {
 
     if let Data::Enum(enum_data) = &input.data {
         if enum_data.variants.is_empty() {
-            panic!("The `Mabe` derive macro cannot be used on empty enums.");
+            panic!("{}", Error::EmptyEnum);
         }
 
         // Iterates over all the variants of the enum to generate the appropriate match arms for each of them.
@@ -63,10 +64,7 @@ pub fn mabe(input: TokenStream) -> TokenStream {
 
                     for (i, f) in fields.iter().enumerate() {
                         if !error_args.contains(f) && !cause_args.contains(f) && !debug_args.contains(f) {
-                            panic!(
-                                "The `{}` field of the `{}` variant is not used in the error, cause, or debug message. Make sure to include it in at least one of the messages.",
-                                f, variant_ident
-                            );
+                            panic!("{}", Error::UnusedVariantField(variant_ident, f));
                         }
 
                         if i == fields.len() - 1 {
@@ -98,12 +96,13 @@ pub fn mabe(input: TokenStream) -> TokenStream {
                     });
                 }
                 Fields::Named(fields) => {
-                    let fields = fields.named
+                    let fields = fields
+                        .named
                         .iter()
                         .map(|f| {
                             f.ident
                                 .clone()
-                                .unwrap_or_else(|| panic!("Failed to retrieve the identifier of a named field in the `{}` variant. This error should not be possible, try reloading the window. If the problem persists, report the issue to the crate's [GitHub repository](https://github.com/AmonRayfa/mabe).", variant_ident))
+                                .unwrap_or_else(|| panic!("{}", Error::IdentRetrievalFailed(variant_ident)))
                                 .to_string()
                         })
                         .collect::<Vec<String>>();
@@ -111,10 +110,7 @@ pub fn mabe(input: TokenStream) -> TokenStream {
 
                     for (i, f) in fields.iter().enumerate() {
                         if !error_args.contains(f) && !cause_args.contains(f) && !debug_args.contains(f) {
-                            panic!(
-                                "The `{}` field of the `{}` variant is not used in the error, cause, or debug message. Make sure to include it in at least one of the messages.",
-                                f, variant_ident
-                            );
+                            panic!("{}", Error::UnusedVariantField(variant_ident, f));
                         }
 
                         if i == fields.len() - 1 {
@@ -148,7 +144,7 @@ pub fn mabe(input: TokenStream) -> TokenStream {
             }
         }
     } else {
-        panic!("The `Mabe` derive macro can only be used with enums.");
+        panic!("{}", Error::NotAnEnum);
     }
 
     let write_debug = quote! { write!(f, "{}", self.state()) };

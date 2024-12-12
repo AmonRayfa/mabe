@@ -2,23 +2,21 @@
 // SPDX-License-Identifier: Apache-2.0.
 
 mod finders;
+use crate::error::api::derive_macro::Error;
 use finders::*;
 use proc_macro2::{Span, TokenStream};
 use quote::quote;
 use syn::{Ident, Lit, Meta, NestedMeta, Variant};
 
-/// A tool that returns the message of the attribute of a variant. The supported attributes are `error`, `cause`, and
-/// `debug`. The function will panic in the following cases: if the attribute doesn't have exactly one argument, if the
-/// attribute is empty, if the argument of the attribute is not a `&str`, if the `error` attribute is not found, or if the
-/// attribute is found more than once.
+/// A tool that returns the message of the attribute of a variant. The function will panic in the following cases: if the
+/// attribute is not `error`, `cause`, or `debug`, if the attribute doesn't have exactly one argument, if the argument of the
+/// attribute is not a string literal, if the `error` attribute is not found, or if the attribute is used more than once on the
+/// same variant.
 pub fn get_msg<A: ToString>(attribute: A, variant: &Variant) -> String {
     let attribute = attribute.to_string();
 
     if attribute != "error" && attribute != "cause" && attribute != "debug" {
-        panic!(
-            "The `utils::helpers::get_msg` function only supports the `error`, `cause`, and `debug` attributes, found `{}`. This error should not be able to occur in production code. Try reloading the window. If the problem persists, report the issue to the crate's [GitHub repository](https://github.com/AmonRayfa/mabe).",
-            attribute
-        );
+        panic!("{}", Error::InvalidAttr(&attribute, "helpers::get_msg"));
     }
 
     let filtered_attrs = variant
@@ -31,36 +29,22 @@ pub fn get_msg<A: ToString>(attribute: A, variant: &Variant) -> String {
                 if let Some(attr_ident) = meta_list.path.get_ident() {
                     if *attr_ident == attribute {
                         if meta_list.nested.len() != 1 {
-                            panic!(
-                                "Expected 1 argument for the `{}` attribute of the `{}` variant, found {}.",
-                                attribute,
-                                variant.ident,
-                                meta_list.nested.len()
-                            );
+                            panic!("{}", Error::UnexpectedAttrArgs(&attribute, meta_list.nested.len(), &variant.ident));
                         }
 
                         if let NestedMeta::Lit(Lit::Str(lit_str)) = &meta_list.nested[0] {
                             if lit_str.value().is_empty() {
-                                panic!(
-                                    "The `{}` attribute of the `{}` variant cannot be empty. When an attribute is present, it must contain a message.",
-                                    attribute, variant.ident
-                                );
+                                panic!("{}", Error::EmptyAttr(&attribute, &variant.ident));
                             }
 
                             msg = lit_str.value();
                         } else {
-                            panic!(
-                                "Expected a `&str` argument for the `{}` attribute of the `{}` variant.",
-                                attribute, variant.ident
-                            );
+                            panic!("{}", Error::UnsupportedAttrArg(&attribute, &variant.ident));
                         }
                     }
                 }
             } else {
-                panic!(
-                    "Failed to parse the attributes of the `{}` variant, make sure the attributes are correctly formatted.",
-                    variant.ident
-                );
+                panic!("{}", Error::AttrParsingFailed(&variant.ident));
             }
 
             if msg.is_empty() {
@@ -71,12 +55,12 @@ pub fn get_msg<A: ToString>(attribute: A, variant: &Variant) -> String {
         })
         .collect::<Vec<String>>();
 
-    if filtered_attrs.is_empty() && attribute == "error" {
-        panic!("The `error` attribute is required for the `{}` variant.", variant.ident);
+    if filtered_attrs.len() > 1 {
+        panic!("{}", Error::ExcessAttr(&attribute, &variant.ident));
     }
 
-    if filtered_attrs.len() > 1 {
-        panic!("The `{}` attribute of the `{}` variant can only be used once.", attribute, variant.ident);
+    if filtered_attrs.is_empty() && attribute == "error" {
+        panic!("{}", Error::ErrorAttrNotFound(&variant.ident));
     }
 
     if filtered_attrs.is_empty() {
@@ -172,9 +156,7 @@ pub fn style_prefix<A: ToString>(attribute: A) -> String {
     let attribute = attribute.to_string();
 
     if attribute != "error" && attribute != "cause" && attribute != "debug" {
-        panic!("The `utils::helper::style_prefix` function only supports the `error`, `cause`, and `debug` attributes, found `{}`. This error should not be able to occur in production code. Try reloading the window. If the problem persists, report the issue to the crate's [GitHub repository](https://github.com/AmonRayfa/mabe).",
-            attribute
-        );
+        panic!("{}", Error::InvalidAttr(&attribute, "helpers::style_prefix"));
     }
 
     #[cfg(feature = "colorize")]

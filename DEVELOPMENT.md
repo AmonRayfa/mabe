@@ -36,7 +36,7 @@ dependencies and scripts.
 About the directories in `src/`:
 
 - `src/api/` contains all the API-related code including all private helper functions and structs used by the public API.
-- `src/error/` contains all the custom error types for the project both for the `api` and the `utils` modules.
+- `src/error/` contains all the custom error types for the project, specifically for the `api` and the `utils` modules.
 - `src/utils/` contains the debugging and benchmarking code for the project as well as other utility code. This directory is
   solely for development purposes and will not be included in the release build.
 

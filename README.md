@@ -1,15 +1,24 @@
-# Mabe
+<p align="center">
+  <h1 align="center">Mabe</h1>
+  <p align="center">Contributions, corrections, and requests can be made through GitHub, and the documentation is available on the platforms linked bellow.</p>
+  <p align="center">Thank you for your interest in the project, enjoy your reading! 🚀</p>
+</p>
 
-[**Mabe**](https://crates.io/crates/mabe) is a simple framework for creating debug-friendly error enums in Rust. Each variant in
-the enum can include an error, cause, and debug message, and errors are displayed in a structured format, showing the messages
-defined for the variant. This allows for a more detailed and clear debugging process.
+<p align="center">
+  <a href="https://github.com/AmonRayfa/mabe"><img alt="GitHub: created in" src="https://img.shields.io/github/created-at/AmonRayfa/mabe?logo=github&label=created%20in&color=red"/></a>
+  <a href="https://github.com/AmonRayfa/mabe"><img alt="GitHub: last commit" src="https://img.shields.io/github/last-commit/AmonRayfa/mabe?display_timestamp=committer&logo=github&color=yellow"/></a>
+  <a href="https://github.com/AmonRayfa/mabe"><img alt="GitHub: milestones" src="https://img.shields.io/github/milestones/all/AmonRayfa/mabe?logo=github&color=blue"/></a>
+  <a href="https://github.com/AmonRayfa/mabe"><img alt="GitHub: CI/CD" src="https://img.shields.io/github/actions/workflow/status/AmonRayfa/mabe/ci-cd.yaml?branch=main&logo=github&label=CI%2FCD"/></a>
+  <br/>
+  <a href="https://crates.io/crates/mabe"><img alt="Crates.io: size" src="https://img.shields.io/crates/size/mabe?logo=rust&logoColor=black&color=black"/></a>
+  <a href="https://crates.io/crates/mabe"><img alt="Crates.io: dependents" src="https://img.shields.io/crates/dependents/mabe?logo=rust&logoColor=black&color=black"/></a>
+</p>
 
-## Table of Contents
+## Introduction
 
-- [Getting Started](#getting-started)
-- [Examples](#examples)
-- [Contributing](#contributing)
-- [License](#license)
+**Mabe** is a simple framework for creating debug-friendly error enums in Rust. Each variant in the enum can include an error,
+cause, and debug message, and errors are displayed in a structured format, showing the messages defined for the variant. This
+allows for a more detailed and clear debugging process.
 
 ## Getting Started
 
@@ -91,10 +100,10 @@ Output:
 This project is open to contributions and suggestions, and any help or feedback is highly appreciated. There is no code of
 conduct, but please be respectful and considerate when engaging with the community.
 
-The project follows the [Koseka Contribution Guidelines](https://koseka.org/contribution-guidelines) which provides standardized
-rules and guidelines for contributing to projects, so make sure to read this first before contributing to the project in any
-way. Additionally, please refer to the [DEVELOPMENT](DEVELOPMENT.md) file for setup instructions and guidance on developing,
-testing, and building the project.
+The project follows the [Koseka Project Guidelines](https://koseka.org/project-guidelines), which provide standardized rules and
+recommendations for project development. Make sure to read these guidelines first before contributing to the project in any way.
+Additionally, please refer to the [DEVELOPMENT](DEVELOPMENT.md) file for setup instructions and guidance on developing, testing,
+and building the project.
 
 Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in this project by you, shall be
 licensed as bellow, without any additional terms or conditions.

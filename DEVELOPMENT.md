@@ -1,13 +1,44 @@
 # Mabe Development
 
-This file is primarily intended for developers who wish to fork the project and potentially contribute to it. It provides
-instructions on setting up the development environment, linting and formatting the code, and testing and building the project.
+This file is primarily intended for developers who wish to fork the project and potentially contribute to it. This project is
+developed in accordance with the [Koseka Project Guidelines](https://koseka.org/project-guidelines), which provide standardized
+rules and recommendations for contributing to the project. Make sure to read these guidelines first before contributing to the
+project in any way.
 
 ## Table of Contents
 
+- [Project Structure](#project-structure)
 - [Setting Up the Development Environment](#setting-up-the-development-environment)
 - [Linting and Formatting the Code](#linting-and-formatting-the-code)
 - [Testing and Building the Project](#testing-and-building-the-project)
+- [License](#license)
+
+## Project Structure
+
+Here are the main directories and files in the project:
+
+```plaintext
+.
+├── src/
+│   ├── api/
+│   ├── error/
+│   ├── utils/
+│   └── lib.rs
+├── tests/
+├── Cargo.toml
+└── package.json
+```
+
+All of the project's main logic is located in the `src/` directory, and the tests are located in the `tests/` directory. The
+`Cargo.toml` file contains the project's metadata and dependencies, and the `package.json` file contains the project's pnpm
+dependencies and scripts.
+
+About the directories in `src/`:
+
+- `src/api/` contains all the API-related code including all private helper functions and structs used by the public API.
+- `src/error/` contains all the custom error types for the project both for the `api` and the `utils` modules.
+- `src/utils/` contains the debugging and benchmarking code for the project as well as other utility code. This directory is
+  solely for development purposes and will not be included in the release build.
 
 ## Setting Up the Development Environment
 
@@ -105,3 +136,9 @@ cargo build --all-features                                # Builds the project w
 ```
 
 If you want to know more about **Cargo**, you can check the [Cargo Documentation](https://doc.rust-lang.org/cargo).
+
+## License
+
+Copyright 2024 Amon Rayfa.
+
+This project is licensed under the [Apache License (Version 2.0)](LICENSE).

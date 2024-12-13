@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0.
 
 //! [**Mabe**](https://github.com/AmonRayfa/mabe) is a simple framework for creating debug-friendly error enums in Rust. Each
-//! variant in the enum can include an error, cause, and debug message, and errors are displayed in a structured format,
-//! showing the messages defined for the variant. This allows for a more detailed and clear debugging process.
+//! variant in the enum can include an error, cause, and debug message, and errors are displayed in a structured format, showing
+//! the messages defined for the variant. This allows for a more detailed and clear debugging process.
 //!
 //! Functionally, this crate is a _procedural macro_ that provides a derive macro called
-//! [`Mabe`](https://docs.rs/mabe/0.3.1/mabe/derive.Mabe.html), which is used to generate the debug-friendly error enums.
+//! [`Mabe`](https://docs.rs/mabe/latest/mabe/derive.Mabe.html), which is used to generate the debug-friendly error enums.
 //!
 //! # Examples
 //!
@@ -88,9 +88,10 @@ use api::mabe;
 #[cfg(debug_assertions)]
 mod utils;
 
-/// The derive macro that generates debug-friendly error enums by providing an `error`, `cause`, and `debug` attribute for each
-/// variant of the enum, which can be used to define the error, cause, and debug messages respectively. The macro also provides
-/// support for the [`Debug`](std::fmt::Debug), [`Display`](std::fmt::Display), and [`Error`](std::error::Error) traits.
+/// The derive macro that creates the debug-friendly error enums. It provides an `error`, `cause`, and `debug` attribute for
+/// each variant of the enum, which can be used to define the error, cause, and debug messages respectively. The macro also
+/// generates implementations for the [`Debug`](std::fmt::Debug), [`Display`](std::fmt::Display), and
+/// [`Error`](std::error::Error) traits.
 #[proc_macro_derive(Mabe, attributes(error, cause, debug))]
 pub fn mabe_derive_macro(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     mabe(input)

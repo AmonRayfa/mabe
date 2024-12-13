@@ -60,7 +60,7 @@ pub fn get_msg<A: ToString>(attribute: A, variant: &Variant) -> String {
     }
 
     if filtered_attrs.is_empty() && attribute == "error" {
-        panic!("{}", Error::ErrorAttrNotFound(&variant.ident));
+        panic!("{}", Error::ErrAttrNotFound(&variant.ident));
     }
 
     if filtered_attrs.is_empty() {

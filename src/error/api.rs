@@ -3,7 +3,7 @@
 
 use syn::Ident;
 
-/// The custom error type for the `api::derive_macro` module.
+/// The custom error type for the `api` module.
 #[derive(Debug)]
 #[non_exhaustive]
 pub enum Error<'a> {

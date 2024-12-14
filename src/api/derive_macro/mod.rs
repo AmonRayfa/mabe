@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 
 mod helpers;
-use crate::error::api::derive_macro::Error;
+use crate::error::api::Error;
 use helpers::*;
 use proc_macro::TokenStream;
 use quote::quote;

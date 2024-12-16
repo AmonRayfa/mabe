@@ -9,13 +9,12 @@ use quote::quote;
 use syn::{Ident, Lit, Meta, NestedMeta, Variant};
 
 /// A tool that returns the message of the attribute of a variant. The function will panic in the following cases: if the
-/// attribute is not `error`, `cause`, or `debug`, if the attribute doesn't have exactly one argument, if the argument of the
-/// attribute is not a string literal, if the `error` attribute is not found, or if the attribute is used more than once on the
-/// same variant.
+/// attribute is not `error` or `debug`, if the attribute doesn't have exactly one argument, if the argument of the attribute is
+/// not a string literal, if the `error` attribute is not found, or if the attribute is used more than once on the same variant.
 pub fn get_msg<A: ToString>(attribute: A, variant: &Variant) -> String {
     let attribute = attribute.to_string();
 
-    if attribute != "error" && attribute != "cause" && attribute != "debug" {
+    if attribute != "error" && attribute != "debug" {
         panic!("{}", Error::InvalidAttr(&attribute, "helpers::get_msg"));
     }
 
@@ -75,7 +74,7 @@ pub fn get_msg<A: ToString>(attribute: A, variant: &Variant) -> String {
 /// all placeholders are replaced with generic placeholders (e.g. `{placeholder0}`, `{placeholder1}`, etc.). The replaced
 /// elements are stored in the extracted arguments vector.
 pub fn format_msg<M: ToString>(msg: M) -> (String, Vec<String>) {
-    let msg = msg.to_string();
+    let msg = msg.to_string().trim().to_string();
     let mut formatted_msg = String::new();
     let mut extracted_args = Vec::<String>::new();
     let mut placeholder_position = 0;
@@ -150,19 +149,18 @@ pub fn map_args<A: ToString, F: ToString>(args: &[A], fields: &[F], dunder: bool
     (pattern_bindings, keyword_args)
 }
 
-/// A tool that returns a styled prefix for the `error`, `cause`, and `debug` attributes using ANSI escape codes. The `colorize`
+/// A tool that returns a styled prefix for the `error` and `debug` attributes using ANSI escape codes. The `colorize` Cargo
 /// feature must be enabled for this function to work.
 pub fn style_prefix<A: ToString>(attribute: A) -> String {
     let attribute = attribute.to_string();
 
-    if attribute != "error" && attribute != "cause" && attribute != "debug" {
+    if attribute != "error" && attribute != "debug" {
         panic!("{}", Error::InvalidAttr(&attribute, "helpers::style_prefix"));
     }
 
     #[cfg(feature = "colorize")]
     match attribute.as_str() {
         "error" => return "\u{1b}[1;31m[error]\u{1b}[0m".to_string(), // ANSI escape code for red and bold text.
-        "cause" => return "\u{1b}[1;33m[cause]\u{1b}[0m".to_string(), // ANSI escape code for yellow and bold text.
         "debug" => return "\u{1b}[1;32m[debug]\u{1b}[0m".to_string(), // ANSI escape code for green and bold text.
         _ => return String::new(),                                    // This should never be reached.
     };

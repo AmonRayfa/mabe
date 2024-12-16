@@ -19,7 +19,6 @@ pub fn mabe(input: TokenStream) -> TokenStream {
 
     let mut state_match_arms = Vec::<proc_macro2::TokenStream>::new();
     let mut error_match_arms = Vec::<proc_macro2::TokenStream>::new();
-    let mut cause_match_arms = Vec::<proc_macro2::TokenStream>::new();
     let mut debug_match_arms = Vec::<proc_macro2::TokenStream>::new();
 
     if let Data::Enum(enum_data) = &input.data {
@@ -33,7 +32,6 @@ pub fn mabe(input: TokenStream) -> TokenStream {
 
             let mut state_msg = format!("{}::{}", enum_ident, variant_ident);
             let (error_msg, error_args) = format_msg(get_msg("error", variant));
-            let (cause_msg, cause_args) = format_msg(get_msg("cause", variant));
             let (debug_msg, debug_args) = format_msg(get_msg("debug", variant));
 
             // Generates the match arms for the variant based on the type of fields it contains.
@@ -42,7 +40,6 @@ pub fn mabe(input: TokenStream) -> TokenStream {
                     let fields = Vec::<String>::new();
 
                     let (_, error_keyword_args) = map_args(&error_args, &fields, true);
-                    let (_, cause_keyword_args) = map_args(&cause_args, &fields, true);
                     let (_, debug_keyword_args) = map_args(&debug_args, &fields, true);
 
                     state_match_arms.push(quote! {
@@ -50,9 +47,6 @@ pub fn mabe(input: TokenStream) -> TokenStream {
                     });
                     error_match_arms.push(quote! {
                         Self::#variant_ident => format!(#error_msg, #(#error_keyword_args),*),
-                    });
-                    cause_match_arms.push(quote! {
-                        Self::#variant_ident => format!(#cause_msg, #(#cause_keyword_args),*),
                     });
                     debug_match_arms.push(quote! {
                         Self::#variant_ident  => format!(#debug_msg, #(#debug_keyword_args),*),
@@ -63,7 +57,7 @@ pub fn mabe(input: TokenStream) -> TokenStream {
                     state_msg.push('(');
 
                     for (i, f) in fields.iter().enumerate() {
-                        if !error_args.contains(f) && !cause_args.contains(f) && !debug_args.contains(f) {
+                        if !error_args.contains(f) && !debug_args.contains(f) {
                             panic!("{}", Error::UnusedVariantField(variant_ident, f));
                         }
 
@@ -79,7 +73,6 @@ pub fn mabe(input: TokenStream) -> TokenStream {
 
                     let (state_pattern_bindings, state_keyword_args) = map_args(&state_args, &fields, true);
                     let (error_pattern_bindings, error_keyword_args) = map_args(&error_args, &fields, true);
-                    let (cause_pattern_bindings, cause_keyword_args) = map_args(&cause_args, &fields, true);
                     let (debug_pattern_bindings, debug_keyword_args) = map_args(&debug_args, &fields, true);
 
                     state_match_arms.push(quote! {
@@ -87,9 +80,6 @@ pub fn mabe(input: TokenStream) -> TokenStream {
                     });
                     error_match_arms.push(quote! {
                         Self::#variant_ident(#(#error_pattern_bindings),*) => format!(#error_msg, #(#error_keyword_args),*),
-                    });
-                    cause_match_arms.push(quote! {
-                        Self::#variant_ident(#(#cause_pattern_bindings),*) => format!(#cause_msg, #(#cause_keyword_args),*),
                     });
                     debug_match_arms.push(quote! {
                         Self::#variant_ident(#(#debug_pattern_bindings),*) => format!(#debug_msg, #(#debug_keyword_args),*),
@@ -109,7 +99,7 @@ pub fn mabe(input: TokenStream) -> TokenStream {
                     state_msg.push_str(" {{ ");
 
                     for (i, f) in fields.iter().enumerate() {
-                        if !error_args.contains(f) && !cause_args.contains(f) && !debug_args.contains(f) {
+                        if !error_args.contains(f) && !debug_args.contains(f) {
                             panic!("{}", Error::UnusedVariantField(variant_ident, f));
                         }
 
@@ -125,7 +115,6 @@ pub fn mabe(input: TokenStream) -> TokenStream {
 
                     let (state_pattern_bindings, state_keyword_args) = map_args(&state_args, &fields, false);
                     let (error_pattern_bindings, error_keyword_args) = map_args(&error_args, &fields, false);
-                    let (cause_pattern_bindings, cause_keyword_args) = map_args(&cause_args, &fields, false);
                     let (debug_pattern_bindings, debug_keyword_args) = map_args(&debug_args, &fields, false);
 
                     state_match_arms.push(quote! {
@@ -133,9 +122,6 @@ pub fn mabe(input: TokenStream) -> TokenStream {
                     });
                     error_match_arms.push(quote! {
                         Self::#variant_ident { #(#error_pattern_bindings),* } => format!(#error_msg, #(#error_keyword_args),*),
-                    });
-                    cause_match_arms.push(quote! {
-                        Self::#variant_ident { #(#cause_pattern_bindings),* } => format!(#cause_msg, #(#cause_keyword_args),*),
                     });
                     debug_match_arms.push(quote! {
                         Self::#variant_ident { #(#debug_pattern_bindings),* } => format!(#debug_msg, #(#debug_keyword_args),*),
@@ -150,7 +136,6 @@ pub fn mabe(input: TokenStream) -> TokenStream {
     let write_debug = quote! { write!(f, "{}", self.state()) };
 
     let error_prefix = style_prefix("error");
-    let cause_prefix = style_prefix("cause");
     let debug_prefix = style_prefix("debug");
 
     let write_display = quote! {
@@ -158,16 +143,12 @@ pub fn mabe(input: TokenStream) -> TokenStream {
             "" => "".to_string(),
             e => format!("\n{} {}", #error_prefix, e),
         };
-        let mut cause = match self.cause().as_str() {
-            "" => "".to_string(),
-            r => format!("\n{} {}", #cause_prefix, r),
-        };
         let mut debug = match self.debug().as_str() {
             "" => "".to_string(),
             s => format!("\n{} {}", #debug_prefix, s),
         };
 
-        write!(f, "{}{}{}", error, cause, debug)
+        write!(f, "{}{}", error, debug)
     };
 
     let implementations = quote! {
@@ -175,8 +156,6 @@ pub fn mabe(input: TokenStream) -> TokenStream {
             pub fn state(&self) -> String { match self { #(#state_match_arms)* } }
 
             pub fn error(&self) -> String { match self { #(#error_match_arms)* } }
-
-            pub fn cause(&self) -> String { match self { #(#cause_match_arms)* } }
 
             pub fn debug(&self) -> String { match self { #(#debug_match_arms)* } }
         }

@@ -16,9 +16,9 @@
 
 ## Introduction
 
-**Mabe** is a simple framework for creating debug-friendly error enums in Rust. Each variant in the enum can include an error,
-cause, and debug message, and errors are displayed in a structured format, showing the messages defined for the variant. This
-allows for a more detailed and clear debugging process.
+**Mabe** is a simple framework for creating debug-friendly error enums in Rust. Each variant in the enum can encapsulate an
+error and a debug message, and errors are presented in a structured format, displaying the messages defined for the variant.
+This allows for a more detailed and clear debugging process.
 
 ## Getting Started
 
@@ -42,7 +42,6 @@ use mabe::Mabe;
 #[derive(Mabe)]
 pub enum ServerError {
     #[error("You are not authorized to access this resource.")]
-    #[cause("Your account does not have the required permissions.")]
     #[debug("Try using a different account.")]
     Unauthorized,
 }
@@ -54,25 +53,22 @@ println!("{}", error);
 ```plaintext
 Output:
 [error] You are not authorized to access this resource.
-[cause] Your account does not have the required permissions.
 [debug] Try using a different account.
 ```
 
-You can also interpolate the values of variant fields in the error, cause, and debug messages as shown below:
+You can also interpolate the values of variant fields in the error and debug messages as shown below:
 
 ```rust
 use mabe::Mabe;
 
 #[derive(Mabe)]
 pub enum ServerError {
-    #[error("Network failure.")]
-    // Interpolates the values of the 1st and 2nd field in the cause message.
-    #[cause("Code {0}: {1}.")]
+    // Interpolates the values of the 1st and 2nd field in the error message.
+    #[error("Network failure. --> Code {0}: {1}.")]
     NetworkFailure(u32, String),
 
-    #[error("Connection lost.")]
-    // Interpolates the value of the `cause` field in the cause message.
-    #[cause("{cause}")]
+    // Interpolates the value of the `cause` field in the error message.
+    #[error("Connection lost. --> {cause}.")]
     // Interpolates the value of the `retry_in` field in the debug message.
     #[debug("Retry in {retry_in} seconds.")]
     ConnectionLost { cause: String, retry_in: u32 }
@@ -87,11 +83,9 @@ println!("{}", error2);
 
 ```plaintext
 Output:
-[error] Network failure.
-[cause] Code 404: Not Found.
+[error] Network failure. --> Code 404: Not Found.
 
-[error] Connection lost.
-[cause] Server down.
+[error] Connection lost. --> Server down.
 [debug] Retry in 10 seconds.
 ```
 

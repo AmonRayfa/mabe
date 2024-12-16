@@ -5,57 +5,51 @@ use mabe::Mabe;
 
 #[derive(Mabe)]
 enum Error {
-    #[error("The error message for Tuple1. The placeholders are: {0}, {y} and {{0}}.")]
-    #[cause("The cause message for Tuple1. The placeholders are: {msg}, {{{cause}}} and false.")]
-    #[debug("The debug message for Tuple1. The placeholders are: {007}, {420} and {000}.")]
+    #[error("The error message for Tuple1. The placeholders are: {0}, {y}, {{0}}, {msg}, and {{{cause}}}.")]
+    #[debug("The debug message for Tuple1. The placeholders are: {007}, {420}, {000}, and false.")]
     Tuple1(String),
 
-    #[error("The error message for Tuple2. The placeholders are: {}, {{}} and {{{0}}}.")]
-    #[cause("The cause message for Tuple2. The placeholders are: {1.5}, {0} and 0.")]
-    #[debug("The debug message for Tuple2. The placeholders are: {0}, {-0} and {0}.")]
+    #[error("The error message for Tuple2. The placeholders are: {}, {{}}, {{{0}}}, {1.5}, and {0}.")]
+    #[debug("The debug message for Tuple2. The placeholders are: {0}, {-0}, {0}, and 0.")]
     Tuple2(i32),
 
-    #[error("The error message for Tuple3. The placeholders are: {{0}}, {2} and {1}.")]
-    #[cause("The cause message for Tuple3. The placeholders are: {2}, {{{--1}}} and {{1}}.")]
-    #[debug("The debug message for Tuple3. The placeholders are: {1}, {{{0}}} and {2}.")]
+    #[error("The error message for Tuple3. The placeholders are: {{0}}, {2}, {1}, {2}, and {{{--1}}}.")]
+    #[debug("The debug message for Tuple3. The placeholders are: {1}, {{{0}}}, {2}, and {{1}}.")]
     Tuple3(String, usize, f64),
 }
 
 #[test]
 fn test() {
-    let tuple1_error = Error::Tuple1("x".to_string());
-    assert_eq!(tuple1_error.state(), "Error::Tuple1(x)");
-    assert_eq!(tuple1_error.error(), "The error message for Tuple1. The placeholders are: x, y and {0}.");
-    assert_eq!(tuple1_error.cause(), "The cause message for Tuple1. The placeholders are: msg, {cause} and false.");
-    assert_eq!(tuple1_error.debug(), "The debug message for Tuple1. The placeholders are: 007, 420 and 000.");
+    let error1 = Error::Tuple1("x".to_string());
+    assert_eq!(error1.state(), "Error::Tuple1(x)");
+    assert_eq!(error1.error(), "The error message for Tuple1. The placeholders are: x, y, {0}, msg, and {cause}.");
+    assert_eq!(error1.debug(), "The debug message for Tuple1. The placeholders are: 007, 420, 000, and false.");
 
     #[cfg(not(feature = "colorize"))]
-    assert_eq!(tuple1_error.to_string(), "\n[error] The error message for Tuple1. The placeholders are: x, y and {0}.\n[cause] The cause message for Tuple1. The placeholders are: msg, {cause} and false.\n[debug] The debug message for Tuple1. The placeholders are: 007, 420 and 000.");
+    assert_eq!(error1.to_string(), "\n[error] The error message for Tuple1. The placeholders are: x, y, {0}, msg, and {cause}.\n[debug] The debug message for Tuple1. The placeholders are: 007, 420, 000, and false.");
 
     #[cfg(feature = "colorize")]
-    println!("{}", tuple1_error);
+    println!("{}", error1);
 
-    let tuple2_error = Error::Tuple2(-53);
-    assert_eq!(tuple2_error.state(), "Error::Tuple2(-53)");
-    assert_eq!(tuple2_error.error(), "The error message for Tuple2. The placeholders are: , {} and {-53}.");
-    assert_eq!(tuple2_error.cause(), "The cause message for Tuple2. The placeholders are: 1.5, -53 and 0.");
-    assert_eq!(tuple2_error.debug(), "The debug message for Tuple2. The placeholders are: -53, -0 and -53.");
+    let error2 = Error::Tuple2(-53);
+    assert_eq!(error2.state(), "Error::Tuple2(-53)");
+    assert_eq!(error2.error(), "The error message for Tuple2. The placeholders are: , {}, {-53}, 1.5, and -53.");
+    assert_eq!(error2.debug(), "The debug message for Tuple2. The placeholders are: -53, -0, -53, and 0.");
 
     #[cfg(not(feature = "colorize"))]
-    assert_eq!(tuple2_error.to_string(), "\n[error] The error message for Tuple2. The placeholders are: , {} and {-53}.\n[cause] The cause message for Tuple2. The placeholders are: 1.5, -53 and 0.\n[debug] The debug message for Tuple2. The placeholders are: -53, -0 and -53.");
+    assert_eq!(error2.to_string(), "\n[error] The error message for Tuple2. The placeholders are: , {}, {-53}, 1.5, and -53.\n[debug] The debug message for Tuple2. The placeholders are: -53, -0, -53, and 0.");
 
     #[cfg(feature = "colorize")]
-    println!("{}", tuple2_error);
+    println!("{}", error2);
 
-    let tuple3_error = Error::Tuple3("msg".to_string(), 100487, 3.1415);
-    assert_eq!(tuple3_error.state(), "Error::Tuple3(msg, 100487, 3.1415)");
-    assert_eq!(tuple3_error.error(), "The error message for Tuple3. The placeholders are: {0}, 3.1415 and 100487.");
-    assert_eq!(tuple3_error.cause(), "The cause message for Tuple3. The placeholders are: 3.1415, {--1} and {1}.");
-    assert_eq!(tuple3_error.debug(), "The debug message for Tuple3. The placeholders are: 100487, {msg} and 3.1415.");
+    let error3 = Error::Tuple3("msg".to_string(), 100487, 3.1415);
+    assert_eq!(error3.state(), "Error::Tuple3(msg, 100487, 3.1415)");
+    assert_eq!(error3.error(), "The error message for Tuple3. The placeholders are: {0}, 3.1415, 100487, 3.1415, and {--1}.");
+    assert_eq!(error3.debug(), "The debug message for Tuple3. The placeholders are: 100487, {msg}, 3.1415, and {1}.");
 
     #[cfg(not(feature = "colorize"))]
-    assert_eq!(tuple3_error.to_string(), "\n[error] The error message for Tuple3. The placeholders are: {0}, 3.1415 and 100487.\n[cause] The cause message for Tuple3. The placeholders are: 3.1415, {--1} and {1}.\n[debug] The debug message for Tuple3. The placeholders are: 100487, {msg} and 3.1415.");
+    assert_eq!(error3.to_string(), "\n[error] The error message for Tuple3. The placeholders are: {0}, 3.1415, 100487, 3.1415, and {--1}.\n[debug] The debug message for Tuple3. The placeholders are: 100487, {msg}, 3.1415, and {1}.");
 
     #[cfg(feature = "colorize")]
-    println!("{}", tuple3_error);
+    println!("{}", error3);
 }

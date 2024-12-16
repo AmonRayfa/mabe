@@ -9,10 +9,10 @@ enum Error {
     Unit1,
 
     #[error("The error message for Unit2. This is a {{test}}.")]
-    #[cause("The cause message for Unit2. This is a {{{test}}}.")]
+    #[debug("The debug message for Unit2. This is a {{{test}}}.")]
     Unit2,
 
-    #[cause("The cause message for Unit3. This is a {test.")]
+    #[debug("The debug message for Unit3. This is a {test.")]
     #[error("The error message for Unit3. This is a test}.")]
     Unit3,
 
@@ -25,179 +25,166 @@ enum Error {
     Unit5,
 
     #[error("The error message for Unit6. This is a {{test}.")]
-    #[cause("The cause message for Unit6. This is a {test}}.")]
-    #[debug("The debug message for Unit6. This is a {{{test}.")]
+    #[debug("The debug message for Unit6. This is a {test}} and a {{{test}.")]
     Unit6,
 
     #[debug("The debug message for Unit7. This is a {test}}}.")]
-    #[error("The error message for Unit7. This is a {{test}}}.")]
-    #[cause("The cause message for Unit7. This is a {{{test}}.")]
+    #[error("The error message for Unit7. This is a {{{test}} and a {{test}}}.")]
     Unit7,
 
-    #[cause("The cause message for Unit8. This is a { test }.")]
-    #[debug("The debug message for Unit8. This is a {{ test }}.")]
+    #[debug("The debug message for Unit8. This is a { test } and a {{ test }}.")]
     #[error("The error message for Unit8. This is a {{{ test }}}.")]
     Unit8,
 
     #[error("The error message for Unit9. This is a { test{} }.")]
-    #[debug("The debug message for Unit9. This is a { {test}{} }.")]
-    #[cause("The cause message for Unit9. This is a {{ {test}{} }}.")]
+    // The debug message for Unit9. This is a { {test}{} } and a {{ {test}{} }}.
+    #[debug("} {")]
     Unit9,
 
-    #[cause("The cause message for Unit10. This is a {{{test}{{}}}}.")]
-    #[error("The error message for Unit10. This is a {{test{}}}.")]
+    #[error("The error message for Unit10. This is a {{{test}{{}}}} and a {{test{}}}.")]
     #[debug("The debug message for Unit10. This is a {{test{{{}}}.")]
     Unit10,
 
-    #[debug("The debug message for Unit11. This is a {{{test}{}.")]
-    #[cause("The cause message for Unit11. This is a {test{{}}}}}.")]
+    #[debug("The debug message for Unit11. This is a {{{test}{} and a {test{{}}}}}.")]
     #[error("The error message for Unit11. This is a {{{}{}{}{{}}test{{{}}}.")]
     Unit11,
 }
 
 #[test]
 fn test() {
-    let unit1_error = Error::Unit1;
-    assert_eq!(unit1_error.state(), "Error::Unit1");
-    assert_eq!(unit1_error.error(), "The error message for Unit1. This is a test.");
-    assert_eq!(unit1_error.cause(), "");
-    assert_eq!(unit1_error.debug(), "");
+    let error1 = Error::Unit1;
+    assert_eq!(error1.state(), "Error::Unit1");
+    assert_eq!(error1.error(), "The error message for Unit1. This is a test.");
+    assert_eq!(error1.debug(), "");
 
     #[cfg(not(feature = "colorize"))]
-    assert_eq!(unit1_error.to_string(), "\n[error] The error message for Unit1. This is a test.");
+    assert_eq!(error1.to_string(), "\n[error] The error message for Unit1. This is a test.");
 
     #[cfg(feature = "colorize")]
-    println!("{}", unit1_error);
+    println!("{}", error1);
 
-    let unit2_error = Error::Unit2;
-    assert_eq!(unit2_error.state(), "Error::Unit2");
-    assert_eq!(unit2_error.error(), "The error message for Unit2. This is a {test}.");
-    assert_eq!(unit2_error.cause(), "The cause message for Unit2. This is a {test}.");
-    assert_eq!(unit2_error.debug(), "");
+    let error2 = Error::Unit2;
+    assert_eq!(error2.state(), "Error::Unit2");
+    assert_eq!(error2.error(), "The error message for Unit2. This is a {test}.");
+    assert_eq!(error2.debug(), "The debug message for Unit2. This is a {test}.");
 
     #[cfg(not(feature = "colorize"))]
     assert_eq!(
-        unit2_error.to_string(),
-        "\n[error] The error message for Unit2. This is a {test}.\n[cause] The cause message for Unit2. This is a {test}."
+        error2.to_string(),
+        "\n[error] The error message for Unit2. This is a {test}.\n[debug] The debug message for Unit2. This is a {test}."
     );
 
     #[cfg(feature = "colorize")]
-    println!("{}", unit2_error);
+    println!("{}", error2);
 
-    let unit3_error = Error::Unit3;
-    assert_eq!(unit3_error.state(), "Error::Unit3");
-    assert_eq!(unit3_error.error(), "The error message for Unit3. This is a test}.");
-    assert_eq!(unit3_error.cause(), "The cause message for Unit3. This is a {test.");
-    assert_eq!(unit3_error.debug(), "");
+    let error3 = Error::Unit3;
+    assert_eq!(error3.state(), "Error::Unit3");
+    assert_eq!(error3.error(), "The error message for Unit3. This is a test}.");
+    assert_eq!(error3.debug(), "The debug message for Unit3. This is a {test.");
 
     #[cfg(not(feature = "colorize"))]
     assert_eq!(
-        unit3_error.to_string(),
-        "\n[error] The error message for Unit3. This is a test}.\n[cause] The cause message for Unit3. This is a {test."
+        error3.to_string(),
+        "\n[error] The error message for Unit3. This is a test}.\n[debug] The debug message for Unit3. This is a {test."
     );
 
     #[cfg(feature = "colorize")]
-    println!("{}", unit3_error);
+    println!("{}", error3);
 
-    let unit4_error = Error::Unit4;
-    assert_eq!(unit4_error.state(), "Error::Unit4");
-    assert_eq!(unit4_error.error(), "The error message for Unit4. This is a {test.");
-    assert_eq!(unit4_error.cause(), "");
-    assert_eq!(unit4_error.debug(), "The debug message for Unit4. This is a test}.");
+    let error4 = Error::Unit4;
+    assert_eq!(error4.state(), "Error::Unit4");
+    assert_eq!(error4.error(), "The error message for Unit4. This is a {test.");
+    assert_eq!(error4.debug(), "The debug message for Unit4. This is a test}.");
 
     #[cfg(not(feature = "colorize"))]
     assert_eq!(
-        unit4_error.to_string(),
+        error4.to_string(),
         "\n[error] The error message for Unit4. This is a {test.\n[debug] The debug message for Unit4. This is a test}."
     );
 
     #[cfg(feature = "colorize")]
-    println!("{}", unit4_error);
+    println!("{}", error4);
 
-    let unit5_error = Error::Unit5;
-    assert_eq!(unit5_error.state(), "Error::Unit5");
-    assert_eq!(unit5_error.error(), "The error message for Unit5. This is a test}}.");
-    assert_eq!(unit5_error.cause(), "");
-    assert_eq!(unit5_error.debug(), "The debug message for Unit5. This is a {{test.");
+    let error5 = Error::Unit5;
+    assert_eq!(error5.state(), "Error::Unit5");
+    assert_eq!(error5.error(), "The error message for Unit5. This is a test}}.");
+    assert_eq!(error5.debug(), "The debug message for Unit5. This is a {{test.");
 
     #[cfg(not(feature = "colorize"))]
     assert_eq!(
-        unit5_error.to_string(),
+        error5.to_string(),
         "\n[error] The error message for Unit5. This is a test}}.\n[debug] The debug message for Unit5. This is a {{test."
     );
 
     #[cfg(feature = "colorize")]
-    println!("{}", unit5_error);
+    println!("{}", error5);
 
-    let unit6_error = Error::Unit6;
-    assert_eq!(unit6_error.state(), "Error::Unit6");
-    assert_eq!(unit6_error.error(), "The error message for Unit6. This is a {test}.");
-    assert_eq!(unit6_error.cause(), "The cause message for Unit6. This is a {test}.");
-    assert_eq!(unit6_error.debug(), "The debug message for Unit6. This is a {test.");
-
-    #[cfg(not(feature = "colorize"))]
-    assert_eq!(unit6_error.to_string(), "\n[error] The error message for Unit6. This is a {test}.\n[cause] The cause message for Unit6. This is a {test}.\n[debug] The debug message for Unit6. This is a {test.");
-
-    #[cfg(feature = "colorize")]
-    println!("{}", unit6_error);
-
-    let unit7_error = Error::Unit7;
-    assert_eq!(unit7_error.state(), "Error::Unit7");
-    assert_eq!(unit7_error.error(), "The error message for Unit7. This is a {test}}.");
-    assert_eq!(unit7_error.cause(), "The cause message for Unit7. This is a {{test}.");
-    assert_eq!(unit7_error.debug(), "The debug message for Unit7. This is a test}.");
+    let error6 = Error::Unit6;
+    assert_eq!(error6.state(), "Error::Unit6");
+    assert_eq!(error6.error(), "The error message for Unit6. This is a {test}.");
+    assert_eq!(error6.debug(), "The debug message for Unit6. This is a {test} and a {test.");
 
     #[cfg(not(feature = "colorize"))]
-    assert_eq!(unit7_error.to_string(), "\n[error] The error message for Unit7. This is a {test}}.\n[cause] The cause message for Unit7. This is a {{test}.\n[debug] The debug message for Unit7. This is a test}.");
+    assert_eq!(
+        error6.to_string(),
+        "\n[error] The error message for Unit6. This is a {test}.\n[debug] The debug message for Unit6. This is a {test."
+    );
 
     #[cfg(feature = "colorize")]
-    println!("{}", unit7_error);
+    println!("{}", error6);
 
-    let unit8_error = Error::Unit8;
-    assert_eq!(unit8_error.state(), "Error::Unit8");
-    assert_eq!(unit8_error.error(), "The error message for Unit8. This is a { test }.");
-    assert_eq!(unit8_error.cause(), "The cause message for Unit8. This is a  test .");
-    assert_eq!(unit8_error.debug(), "The debug message for Unit8. This is a { test }.");
+    let error7 = Error::Unit7;
+    assert_eq!(error7.state(), "Error::Unit7");
+    assert_eq!(error7.error(), "The error message for Unit7. This is a {{test} and a {test}}.");
+    assert_eq!(error7.debug(), "The debug message for Unit7. This is a test}.");
 
     #[cfg(not(feature = "colorize"))]
-    assert_eq!(unit8_error.to_string(), "\n[error] The error message for Unit8. This is a { test }.\n[cause] The cause message for Unit8. This is a  test .\n[debug] The debug message for Unit8. This is a { test }.");
+    assert_eq!(error7.to_string(), "\n[error] The error message for Unit7. This is a {{test} and a {test}}.\n[debug] The debug message for Unit7. This is a test}.");
 
     #[cfg(feature = "colorize")]
-    println!("{}", unit8_error);
+    println!("{}", error7);
 
-    let unit9_error = Error::Unit9;
-    assert_eq!(unit9_error.state(), "Error::Unit9");
-    assert_eq!(unit9_error.error(), "The error message for Unit9. This is a  test{ }.");
-    assert_eq!(unit9_error.cause(), "The cause message for Unit9. This is a { test }.");
-    assert_eq!(unit9_error.debug(), "The debug message for Unit9. This is a  {test }.");
+    let error8 = Error::Unit8;
+    assert_eq!(error8.state(), "Error::Unit8");
+    assert_eq!(error8.error(), "The error message for Unit8. This is a { test }.");
+    assert_eq!(error8.debug(), "The debug message for Unit8. This is a test and a { test }.");
 
     #[cfg(not(feature = "colorize"))]
-    assert_eq!(unit9_error.to_string(), "\n[error] The error message for Unit9. This is a  test{ }.\n[cause] The cause message for Unit9. This is a { test }.\n[debug] The debug message for Unit9. This is a  {test }.");
+    assert_eq!(error8.to_string(), "\n[error] The error message for Unit8. This is a { test }.\n[debug] The debug message for Unit8. This is a test and a { test }.");
 
     #[cfg(feature = "colorize")]
-    println!("{}", unit9_error);
+    println!("{}", error8);
 
-    let unit10_error = Error::Unit10;
-    assert_eq!(unit10_error.state(), "Error::Unit10");
-    assert_eq!(unit10_error.error(), "The error message for Unit10. This is a {test}.");
-    assert_eq!(unit10_error.cause(), "The cause message for Unit10. This is a {test{}}.");
-    assert_eq!(unit10_error.debug(), "The debug message for Unit10. This is a {test{}.");
+    let error9 = Error::Unit9;
+    assert_eq!(error9.state(), "Error::Unit9");
+    assert_eq!(error9.error(), "The error message for Unit9. This is a  test{ }.");
+    assert_eq!(error9.debug(), "The debug message for Unit9. This is a  {test } and a  { test }.");
 
     #[cfg(not(feature = "colorize"))]
-    assert_eq!(unit10_error.to_string(), "\n[error] The error message for Unit10. This is a {test}.\n[cause] The cause message for Unit10. This is a {test{}}.\n[debug] The debug message for Unit10. This is a {test{}.");
+    assert_eq!(error9.to_string(), "\n[error] The error message for Unit9. This is a  test{ }.\n[debug] The debug message for Unit9. This is a  {test } and a  { test }.");
 
     #[cfg(feature = "colorize")]
-    println!("{}", unit10_error);
+    println!("{}", error9);
 
-    let unit11_error = Error::Unit11;
-    assert_eq!(unit11_error.state(), "Error::Unit11");
-    assert_eq!(unit11_error.error(), "The error message for Unit11. This is a {{}test{}.");
-    assert_eq!(unit11_error.cause(), "The cause message for Unit11. This is a test{{}}.");
-    assert_eq!(unit11_error.debug(), "The debug message for Unit11. This is a {test.");
+    let error10 = Error::Unit10;
+    assert_eq!(error10.state(), "Error::Unit10");
+    assert_eq!(error10.error(), "The error message for Unit10. This is a {test{}} and a {test}.");
+    assert_eq!(error10.debug(), "The debug message for Unit10. This is a {test{}.");
 
     #[cfg(not(feature = "colorize"))]
-    assert_eq!(unit11_error.to_string(), "\n[error] The error message for Unit11. This is a {{}test{}.\n[cause] The cause message for Unit11. This is a test{{}}.\n[debug] The debug message for Unit11. This is a {test.");
+    assert_eq!(error10.to_string(), "\n[error] The error message for Unit10. This is a {test{}} and a {test}.\n[debug] The debug message for Unit10. This is a {test{}.");
 
     #[cfg(feature = "colorize")]
-    println!("{}", unit11_error);
+    println!("{}", error10);
+
+    let error11 = Error::Unit11;
+    assert_eq!(error11.state(), "Error::Unit11");
+    assert_eq!(error11.error(), "The error message for Unit11. This is a {{}test{}.");
+    assert_eq!(error11.debug(), "The debug message for Unit11. This is a {test and a test{{}}.");
+
+    #[cfg(not(feature = "colorize"))]
+    assert_eq!(error11.to_string(), "\n[error] The error message for Unit11. This is a {{}test{}.\n[debug] The debug message for Unit11. This is a {test and a test{{}}.");
+
+    #[cfg(feature = "colorize")]
+    println!("{}", error11);
 }

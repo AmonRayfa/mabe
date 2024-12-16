@@ -28,6 +28,9 @@ fn test() {
     #[cfg(not(feature = "colorize"))]
     assert_eq!(error1.to_string(), "\n[error] The error message for Tuple1. The placeholders are: x, y, {0}, msg, and {cause}.\n[debug] The debug message for Tuple1. The placeholders are: 007, 420, 000, and false.");
 
+    #[cfg(feature = "colorize")]
+    assert_eq!(error1.to_string(), "\n\u{1b}[1;31m[error]\u{1b}[0m The error message for Tuple1. The placeholders are: x, y, {0}, msg, and {cause}.\n\u{1b}[1;32m[debug]\u{1b}[0m The debug message for Tuple1. The placeholders are: 007, 420, 000, and false.");
+
     println!("{}", error1);
 
     let error2 = Error::Tuple2(-53);
@@ -38,6 +41,9 @@ fn test() {
     #[cfg(not(feature = "colorize"))]
     assert_eq!(error2.to_string(), "\n[error] The error message for Tuple2. The placeholders are: , {}, {-53}, 1.5, and -53.\n[debug] The debug message for Tuple2. The placeholders are: -53, -0, -53, and 0.");
 
+    #[cfg(feature = "colorize")]
+    assert_eq!(error2.to_string(), "\n\u{1b}[1;31m[error]\u{1b}[0m The error message for Tuple2. The placeholders are: , {}, {-53}, 1.5, and -53.\n\u{1b}[1;32m[debug]\u{1b}[0m The debug message for Tuple2. The placeholders are: -53, -0, -53, and 0.");
+
     println!("{}", error2);
 
     let error3 = Error::Tuple3("msg".to_string(), 100487, 3.1415);
@@ -47,6 +53,9 @@ fn test() {
 
     #[cfg(not(feature = "colorize"))]
     assert_eq!(error3.to_string(), "\n[error] The error message for Tuple3. The placeholders are: {0}, 3.1415, 100487, 3.1415, and {--1}.\n[debug] The debug message for Tuple3. The placeholders are: 100487, {msg}, 3.1415, and {1}.");
+
+    #[cfg(feature = "colorize")]
+    assert_eq!(error3.to_string(), "\n\u{1b}[1;31m[error]\u{1b}[0m The error message for Tuple3. The placeholders are: {0}, 3.1415, 100487, 3.1415, and {--1}.\n\u{1b}[1;32m[debug]\u{1b}[0m The debug message for Tuple3. The placeholders are: 100487, {msg}, 3.1415, and {1}.");
 
     println!("{}", error3);
 }

@@ -5,6 +5,8 @@ developed in accordance with the [Koseka Project Guidelines](https://koseka.org/
 rules and recommendations for contributing to the project. Make sure to read these guidelines first before contributing to the
 project in any way.
 
+For information on how to use the project, please refer to the [README](README.md) file.
+
 ## Table of Contents
 
 - [Project Structure](#project-structure)

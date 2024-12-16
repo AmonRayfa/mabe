@@ -28,7 +28,6 @@ fn test() {
     #[cfg(not(feature = "colorize"))]
     assert_eq!(error1.to_string(), "\n[error] The error message for Struct1. The placeholders are: 0, Something..., {0}, None, and {None}.\n[debug] The debug message for Struct1. The placeholders are: 007, 420, 000, and false.");
 
-    #[cfg(feature = "colorize")]
     println!("{}", error1);
 
     let error2 = Error::Struct2 { speed: 100 };
@@ -39,7 +38,6 @@ fn test() {
     #[cfg(not(feature = "colorize"))]
     assert_eq!(error2.to_string(), "\n[error] The error message for Struct2. The placeholders are: , {}, {msg}, 100, and height.\n[debug] The debug message for Struct2. The placeholders are: comment, -0, 0, and 0.");
 
-    #[cfg(feature = "colorize")]
     println!("{}", error2);
 
     let error3 = Error::Struct3 { comment: "msg".to_string(), height: 100487, ratio: 3.1415 };
@@ -50,6 +48,5 @@ fn test() {
     #[cfg(not(feature = "colorize"))]
     assert_eq!(error3.to_string(), "\n[error] The error message for Struct3. The placeholders are: {0}, 3.1415, 100487, 2, and {--1}.\n[debug] The debug message for Struct3. The placeholders are: msg, {0}, 3.1415, and {ratio}.");
 
-    #[cfg(feature = "colorize")]
     println!("{}", error3);
 }

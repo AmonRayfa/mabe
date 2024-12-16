@@ -37,8 +37,7 @@ enum Error {
     Unit8,
 
     #[error("The error message for Unit9. This is a { test{} }.")]
-    // The debug message for Unit9. This is a { {test}{} } and a {{ {test}{} }}.
-    #[debug("} {")]
+    #[debug("The debug message for Unit9. This is a { {test}{} } and a {{ {test}{} }}.")]
     Unit9,
 
     #[error("The error message for Unit10. This is a {{{test}{{}}}} and a {{test{}}}.")]

@@ -86,11 +86,19 @@ pub fn format_msg<M: ToString>(msg: M) -> (String, Vec<String>) {
         let generic_placeholder = format!("{{placeholder{}}}", placeholder_position);
 
         if index_left_brace.is_some() && index_right_brace.is_some() {
-            formatted_msg.push_str(&msg[checkpoint..index_left_brace.unwrap()]);
-            formatted_msg.push_str(generic_placeholder.as_str());
-            extracted_args.push(msg[index_left_brace.unwrap() + 1..index_right_brace.unwrap()].to_string());
-            placeholder_position += 1;
-            checkpoint = index_right_brace.unwrap() + 1;
+            if index_left_brace < index_right_brace {
+                formatted_msg.push_str(&msg[checkpoint..index_left_brace.unwrap()]);
+                formatted_msg.push_str(generic_placeholder.as_str());
+                extracted_args.push(msg[index_left_brace.unwrap() + 1..index_right_brace.unwrap()].to_string());
+                placeholder_position += 1;
+                checkpoint = index_right_brace.unwrap() + 1;
+            } else {
+                formatted_msg.push_str(&msg[checkpoint..index_right_brace.unwrap()]);
+                formatted_msg.push_str(generic_placeholder.as_str());
+                extracted_args.push("}".to_string());
+                placeholder_position += 1;
+                checkpoint = index_right_brace.unwrap() + 1;
+            }
         } else if index_left_brace.is_some() && index_right_brace.is_none() {
             formatted_msg.push_str(&msg[checkpoint..index_left_brace.unwrap()]);
             formatted_msg.push_str(generic_placeholder.as_str());

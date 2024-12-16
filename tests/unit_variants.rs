@@ -121,12 +121,12 @@ fn test() {
     let error6 = Error::Unit6;
     assert_eq!(error6.state(), "Error::Unit6");
     assert_eq!(error6.error(), "The error message for Unit6. This is a {test}.");
-    assert_eq!(error6.debug(), "The debug message for Unit6. This is a {test} and a {test.");
+    assert_eq!(error6.debug(), "The debug message for Unit6. This is a test}} and a {{{test.");
 
     #[cfg(not(feature = "colorize"))]
     assert_eq!(
         error6.to_string(),
-        "\n[error] The error message for Unit6. This is a {test}.\n[debug] The debug message for Unit6. This is a {test."
+        "\n[error] The error message for Unit6. This is a {test}.\n[debug] The debug message for Unit6. This is a test}} and a {{{test."
     );
 
     #[cfg(feature = "colorize")]
@@ -134,11 +134,11 @@ fn test() {
 
     let error7 = Error::Unit7;
     assert_eq!(error7.state(), "Error::Unit7");
-    assert_eq!(error7.error(), "The error message for Unit7. This is a {{test} and a {test}}.");
+    assert_eq!(error7.error(), "The error message for Unit7. This is a {test}} and a {{test}.");
     assert_eq!(error7.debug(), "The debug message for Unit7. This is a test}.");
 
     #[cfg(not(feature = "colorize"))]
-    assert_eq!(error7.to_string(), "\n[error] The error message for Unit7. This is a {{test} and a {test}}.\n[debug] The debug message for Unit7. This is a test}.");
+    assert_eq!(error7.to_string(), "\n[error] The error message for Unit7. This is a {test}} and a {{test}.\n[debug] The debug message for Unit7. This is a test}.");
 
     #[cfg(feature = "colorize")]
     println!("{}", error7);
@@ -146,10 +146,10 @@ fn test() {
     let error8 = Error::Unit8;
     assert_eq!(error8.state(), "Error::Unit8");
     assert_eq!(error8.error(), "The error message for Unit8. This is a { test }.");
-    assert_eq!(error8.debug(), "The debug message for Unit8. This is a test and a { test }.");
+    assert_eq!(error8.debug(), "The debug message for Unit8. This is a  test  and a { test }.");
 
     #[cfg(not(feature = "colorize"))]
-    assert_eq!(error8.to_string(), "\n[error] The error message for Unit8. This is a { test }.\n[debug] The debug message for Unit8. This is a test and a { test }.");
+    assert_eq!(error8.to_string(), "\n[error] The error message for Unit8. This is a { test }.\n[debug] The debug message for Unit8. This is a  test  and a { test }.");
 
     #[cfg(feature = "colorize")]
     println!("{}", error8);
@@ -157,10 +157,10 @@ fn test() {
     let error9 = Error::Unit9;
     assert_eq!(error9.state(), "Error::Unit9");
     assert_eq!(error9.error(), "The error message for Unit9. This is a  test{ }.");
-    assert_eq!(error9.debug(), "The debug message for Unit9. This is a  {test } and a  { test }.");
+    assert_eq!(error9.debug(), "The debug message for Unit9. This is a  {test } and a { test }.");
 
     #[cfg(not(feature = "colorize"))]
-    assert_eq!(error9.to_string(), "\n[error] The error message for Unit9. This is a  test{ }.\n[debug] The debug message for Unit9. This is a  {test } and a  { test }.");
+    assert_eq!(error9.to_string(), "\n[error] The error message for Unit9. This is a  test{ }.\n[debug] The debug message for Unit9. This is a  {test } and a { test }.");
 
     #[cfg(feature = "colorize")]
     println!("{}", error9);

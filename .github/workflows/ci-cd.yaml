@@ -61,6 +61,12 @@ jobs:
       - name: Install GitHub CLI
         run: sudo apt-get install gh
 
+      - name: Extract release notes
+        run: |
+          RELEASE_NOTES=$(awk '/^## /{i++}i==2{print; while(getline && !/^## /) print; exit}' CHANGELOG.md | tail -n +3 | head -n -1)
+          echo "$RELEASE_NOTES" > release_notes.md
+          echo "::set-output name=notes::$(cat release_notes.md)"
+
       - name: Create the release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

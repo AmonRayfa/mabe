@@ -36,9 +36,6 @@ jobs:
       - name: Install target
         run: rustup target add ${{ matrix.target }}
 
-      - name: Setup binfmt_misc
-        run: sudo mount binfmt_misc -t binfmt_misc /proc/sys/fs/binfmt_misc
-
       - name: Cross build for ${{ matrix.target }}
         run: cross build --target ${{ matrix.target }} --all-features --verbose
 

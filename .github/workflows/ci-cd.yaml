@@ -33,13 +33,11 @@ jobs:
       - name: Install cross
         run: cargo install cross --git https://github.com/cross-rs/cross
 
-      - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y docker.io qemu-user-static
+      - name: Install target
+        run: rustup target add ${{ matrix.target }}
 
       - name: Setup binfmt_misc
-        run: |
-          sudo mount binfmt_misc -t binfmt_misc /proc/sys/fs/binfmt_misc
-          sudo docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+        run: sudo mount binfmt_misc -t binfmt_misc /proc/sys/fs/binfmt_misc
 
       - name: Cross build for ${{ matrix.target }}
         run: cross build --target ${{ matrix.target }} --all-features --verbose

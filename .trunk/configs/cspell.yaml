@@ -23,5 +23,6 @@ words:
     println,
     rayfa,
     rollup,
+    rustup,
     trunkio,
   ]

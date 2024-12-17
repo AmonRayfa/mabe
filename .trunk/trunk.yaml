@@ -20,7 +20,7 @@ lint:
     - actionlint@1.7.4
     - checkov@3.2.334
     - clippy@1.82.0
-    - cspell@8.16.1
+    - cspell@8.17.1
     - git-diff-check
     - markdownlint@0.43.0
     - osv-scanner@1.9.1

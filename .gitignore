@@ -21,7 +21,6 @@ tsconfig.tsbuildinfo
 *.local
 .env
 .venv
-docs/gen
 node_modules
 target
 tmp

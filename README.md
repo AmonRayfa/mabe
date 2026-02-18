@@ -1,7 +1,7 @@
 <div align="center">
   <h1 align="center">Mabe</h1>
   <p align="center">
-    Contributions, corrections, and requests can be made through GitHub, and the documentation is available <a href="https://mabe.readthedocs.io/en/latest/">here</a>.
+    Contributions, corrections, and requests can be made through GitHub, and the documentation is available <a href="https://mabe.readthedocs.io">here</a>.
   </p>
   <p align="center">Thank you for your interest in the project. Enjoy your reading! 🚀</p>
 </div>
@@ -22,7 +22,7 @@
 
 ---
 
-**Mabe** is an ergonomic, opinionated library for creating debug-friendly errors in Rust. It simplifies error handling by providing an [`Error`](https://mabe.readthedocs.io/en/latest/generated/mabe/mabe_derive/derive.Error.html) derive macro for defining structured errors and a [`main`](https://mabe.readthedocs.io/en/latest/generated/mabe/mabe_attr/attr.main.html) attribute macro that formats error chains into a clean, readable tree structure in the terminal.
+**Mabe** is an ergonomic, opinionated library for creating debug-friendly errors in Rust. It simplifies error handling by providing an [`Error`](https://mabe.readthedocs.io/en/stable/mabe_derive/derive.Error.html) derive macro for defining structured errors and a [`main`](https://mabe.readthedocs.io/en/stable/mabe/attr.main.html) attribute macro that formats error chains into a clean, readable tree structure in the terminal.
 
 <h2><img height="20" alt="branches" src="./img/branches.svg">&nbsp;&nbsp;Branches</h2>
 
@@ -49,9 +49,9 @@ To use the **nightly version**, you can change the branch to `dev`:
 mabe = { git = "https://github.com/AmonRayfa/mabe", branch = "dev" }
 ```
 
-You can now use the [`main`](https://mabe.readthedocs.io/en/latest/generated/mabe/mabe_attr/attr.main.html) attribute on your entry point, along with the re-exported [`bail`](https://docs.rs/anyhow/latest/anyhow/macro.bail.html), [`Context`](https://docs.rs/anyhow/latest/anyhow/trait.Context.html), and [`Result`](https://docs.rs/anyhow/latest/anyhow/type.Result.html) items from the [`anyhow`](https://docs.rs/anyhow/latest/anyhow/) crate.
+You can now use the [`main`](https://mabe.readthedocs.io/en/stable/mabe/attr.main.html) attribute on your entry point, along with the re-exported [`bail`](https://docs.rs/anyhow/latest/anyhow/macro.bail.html), [`Context`](https://docs.rs/anyhow/latest/anyhow/trait.Context.html), and [`Result`](https://docs.rs/anyhow/latest/anyhow/type.Result.html) items from the [`anyhow`](https://docs.rs/anyhow/latest/anyhow/) crate.
 
-If you enable the `structured` feature, you can use the [`Error`](https://mabe.readthedocs.io/en/latest/generated/mabe/mabe_derive/derive.Error.html) derive macro to define custom error enums with interpolated messages.
+If you enable the `structured` feature, you can use the [`Error`](https://mabe.readthedocs.io/en/stable/mabe_derive/derive.Error.html) derive macro to define custom error enums with interpolated messages.
 
 <h2><img height="20" alt="usage" src="./img/usage.svg">&nbsp;&nbsp;Usage</h2>
 
@@ -123,7 +123,7 @@ When running the code above, the terminal output will be:
  └─ Connection lost --> Server down. Retry in 10 seconds.
 ```
 
-For further details on how to use the project, please refer to the [documentation](https://mabe.readthedocs.io/en/latest/).
+For further details on how to use the project, please refer to the [documentation](https://mabe.readthedocs.io).
 
 <h2><img height="20" alt="security" src="./img/security.svg">&nbsp;&nbsp;Security</h2>
 

@@ -19,6 +19,8 @@ name = "mabe"
 version = "0.0.0"
 dependencies = [
  "anyhow",
+ "mabe_attr",
+ "mabe_derive",
  "term_size",
 ]
 

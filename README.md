@@ -17,7 +17,7 @@
   <a href="https://github.com/AmonRayfa/mabe/stargazers"><img src="https://img.shields.io/github/stars/AmonRayfa/mabe?style=flat&logo=github&color=DCB456" alt="stars" /></a>
   <br>
   <a href="Cargo.toml"><img src="https://img.shields.io/badge/Dependencies-5-black?style=flat&logo=rust&logoColor=black" alt="Dependencies" /></a>
-  <a href="Cargo.toml"><img src="https://img.shields.io/badge/Size-11.7kB-black?style=flat&logo=rust&logoColor=black" alt="Size" /></a>
+  <a href="Cargo.toml"><img src="https://img.shields.io/badge/Size-10.2kB-black?style=flat&logo=rust&logoColor=black" alt="Size" /></a>
 </div>
 
 ---

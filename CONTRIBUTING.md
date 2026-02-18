@@ -36,7 +36,7 @@ See the [API reference](https://mabe.readthedocs.io/en/stable/mabe/all.html) for
 
 First, ensure that you have the latest version of **Rust** installed on your machine. You can install **Rust** by following the instructions on the official [Rust website](https://www.rust-lang.org/tools/install).
 
-Second, this project uses [**Trunk**](https://www.trunk.io) as an npm package for formatting and linting the code, and **npm** as a package manager. So, make sure you have **node.js** and **npm** installed on your machine. You can install both of them from the official [node.js](https://nodejs.org) website.
+Second, this project uses the [**Trunk Code Quality CLI**](https://docs.trunk.io/code-quality/overview) as an npm package for formatting and linting the code, and **npm** as a package manager. So, make sure you have **node.js** and **npm** installed on your machine. You can install both of them from the official [node.js](https://nodejs.org) website.
 
 Next, clone the `mabe` repository to your local machine and install the development dependencies:
 
@@ -46,7 +46,7 @@ cd mabe                                                     # Moves into the pro
 npm install                                                 # Installs the development dependencies.
 ```
 
-Since **Trunk** is used for formatting the code, it's best if you disable the _format on save_ option in your editor to avoid potential conflicts with the project's formatting configurations.
+Since the **Trunk CLI** is used for formatting the code, it's best if you disable the _format on save_ option in your editor to avoid potential conflicts with the project's formatting configurations.
 
 If you are using [**Zed**](https://zed.dev), you can locally disable the _format on save_ option of your editor for this project by adding the following line to the `.zed/settings.json` file at the root of the project directory:
 
@@ -72,7 +72,7 @@ If you have followed all the steps correctly, you should now have a working deve
 
 The linters and formatters work through git hooks, so they will run automatically when you commit changes. However, it's best to also run them manually before committing changes to avoid failing the commit hook.
 
-To make sure **Trunk** is managing the git hooks, you can run the following command:
+To make sure the **Trunk CLI** is managing the git hooks, you can run the following command:
 
 ```sh
 npm run trunk git-hooks sync
@@ -91,8 +91,6 @@ You can manually format the code using the following commands:
 npm run fmt                                                 # Formats all the changed files.
 npm run fmt --all                                           # Formats all the files in the repository.
 ```
-
-If you want to know more about **Trunk**, you can check the [Trunk documentation](https://docs.trunk.io).
 
 ## Testing and Building the Project
 
@@ -115,14 +113,14 @@ cargo build --features structured                           # Builds the project
 cargo build --all-features                                  # Builds the project with all the features.
 ```
 
-You can generate the documentation using the following command:
+## Building the Documentation
+
+You can build the documentation using the following command:
 
 ```sh
-npm run doc                                                 # Generates the documentation at `docs/gen/`.
-npm run doc:open                                            # Generates the documentation and opens it in the browser.
+npm run doc                                                 # Builds the documentation at `docs/dist/`.
+npm run doc:open                                            # Builds the documentation and opens it in the browser.
 ```
-
-If you want to know more about **Cargo**, you can check the [Cargo documentation](https://doc.rust-lang.org/cargo).
 
 ## License
 

@@ -1,0 +1,93 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [dev, v1]
+    tags: [v*-*.*]
+  pull_request:
+    branches: [dev, v1]
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          # Linux
+          - aarch64-unknown-linux-gnu
+          - arm-unknown-linux-gnueabi
+          - arm-unknown-linux-gnueabihf
+          - armv7-unknown-linux-gnueabi
+          - armv7-unknown-linux-gnueabihf
+          - i586-unknown-linux-gnu
+          - i686-unknown-linux-gnu
+          - x86_64-unknown-linux-gnu
+
+          # Windows
+          - i686-pc-windows-gnu
+          - x86_64-pc-windows-gnu
+
+          # Android
+          - aarch64-linux-android
+          - arm-linux-androideabi
+          - armv7-linux-androideabi
+          - i686-linux-android
+          - x86_64-linux-android
+
+          # WebAssembly
+          - wasm32-unknown-emscripten
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+
+      - name: Install cross
+        uses: taiki-e/install-action@cross
+
+      - name: Install target
+        run: rustup target add ${{ matrix.target }}
+
+      - name: Build for debugging
+        run: cross build --target ${{ matrix.target }} --all-features --verbose
+
+      - name: Build for release
+        run: cross build --target ${{ matrix.target }} --release --all-features --verbose
+
+      - name: Run tests
+        run: cross test --target ${{ matrix.target }} --all-features --verbose
+
+  cd:
+    permissions:
+      contents: write
+    needs: [ci]
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create the release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RELEASE_VERSION="${GITHUB_REF#refs/tags/}"
+          RELEASE_TITLE="$(basename "$GITHUB_REPOSITORY") $RELEASE_VERSION"
+
+          # Updated to i==1 to match your new CHANGELOG format
+          if [ -f "CHANGELOG.md" ]; then
+            RELEASE_NOTES=$(awk '/^## /{i++}i==1{print; while(getline && !/^## /) print; exit}' CHANGELOG.md | tail -n +2)
+          else
+            RELEASE_NOTES="No changelog found."
+          fi
+
+          gh release create "$RELEASE_VERSION" --title "$RELEASE_TITLE" --notes "$RELEASE_NOTES"

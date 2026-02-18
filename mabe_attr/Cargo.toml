@@ -1,0 +1,11 @@
+[package]
+name = "mabe_attr"
+edition = "2024"
+publish = false
+
+[lib]
+proc-macro = true
+
+[dependencies]
+quote = { workspace = true }
+syn = { workspace = true }

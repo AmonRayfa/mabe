@@ -1,0 +1,7 @@
+[build]
+rustdocflags = [
+  "--extend-css",
+  "docs/.utils/setup.css",
+  "--html-in-header",
+  "docs/.utils/force-theme.html",
+]

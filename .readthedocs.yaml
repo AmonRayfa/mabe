@@ -1,0 +1,22 @@
+version: 2
+
+build:
+  os: ubuntu-22.04
+  tools:
+    rust: "1.75"
+
+  commands:
+    # 1. Cleans the doc cache.
+    - rm -rf target/doc
+
+    # 2. Builds the API reference.
+    - cargo doc --workspace --no-deps
+
+    # 3. Creates the output directory expected by ReadTheDocs.
+    - mkdir -p $READTHEDOCS_OUTPUT/html/
+
+    # 4. Copies the cargo output (in 'target/doc') to the RTD output directory.
+    - cp -r target/doc/* $READTHEDOCS_OUTPUT/html/
+
+    # 5. Redirects users to 'mabe/index.html'.
+    - echo '<meta http-equiv="refresh" content="0; url=mabe/index.html">' > $READTHEDOCS_OUTPUT/html/index.html

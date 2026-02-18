@@ -1,0 +1,21 @@
+[package]
+name = "mabe_derive"
+edition = "2024"
+publish = false
+
+[lib]
+proc-macro = true
+
+[[test]]
+name = "unit_variants"
+
+[[test]]
+name = "tuple_variants"
+
+[[test]]
+name = "struct_variants"
+
+[dependencies]
+proc-macro2 = { workspace = true }
+quote = { workspace = true }
+syn = { workspace = true }

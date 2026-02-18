@@ -1,6 +1,6 @@
 [package]
 name = "mabe_attr"
-edition = "2024"
+edition = "2021"
 publish = false
 
 [lib]

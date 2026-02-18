@@ -1,6 +1,6 @@
 [package]
 name = "mabe"
-edition = "2021"
+edition = "2024"
 authors = ["Amon Rayfa <amon@koseka.net>"]
 description = "A simple Rust library for creating debug-friendly errors."
 repository = "https://github.com/AmonRayfa/mabe"

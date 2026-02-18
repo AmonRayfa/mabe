@@ -19,4 +19,4 @@ build:
     - cp -r target/doc/* $READTHEDOCS_OUTPUT/html/
 
     # 5. Redirects users to 'mabe/index.html'.
-    - echo '<meta http-equiv="refresh" content="0; url=mabe/index.html">' > $READTHEDOCS_OUTPUT/html/index.html
+    - cp docs/.utils/redirect.html $READTHEDOCS_OUTPUT/html/index.html

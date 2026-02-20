@@ -92,12 +92,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           RELEASE_VERSION="${GITHUB_REF#refs/tags/}"
-          RELEASE_TITLE="$(basename "$GITHUB_REPOSITORY") $RELEASE_VERSION"
-
           if [ -f "CHANGELOG.md" ]; then
              RELEASE_NOTES=$(awk '/^## /{i++}i==1{print; while(getline && !/^## /) print; exit}' CHANGELOG.md | tail -n +2)
           else
              RELEASE_NOTES="No changelog found."
           fi
-
-          gh release create "$RELEASE_VERSION" --title "$RELEASE_TITLE" --notes "$RELEASE_NOTES"
+          gh release create "$RELEASE_VERSION" --title "$RELEASE_VERSION" --notes "$RELEASE_NOTES"

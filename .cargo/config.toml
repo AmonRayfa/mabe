@@ -1,7 +1,7 @@
 [build]
 rustdocflags = [
   "--extend-css",
-  "docs/.utils/setup.css",
+  ".cargo/setup.css",
   "--html-in-header",
-  "docs/.utils/force-theme.html",
+  ".cargo/force-theme.html",
 ]

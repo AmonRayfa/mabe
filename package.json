@@ -7,13 +7,10 @@
   "scripts": {
     "trunk": "trunk",
     "check": "trunk check",
-    "fmt": "trunk fmt",
-    "doc": "node docs/.utils/build-doc.js",
-    "doc:open": "npm run doc && open-cli docs/dist/mabe/index.html"
+    "fmt": "trunk fmt"
   },
   "devDependencies": {
-    "@trunkio/launcher": "^1.3.4",
-    "open-cli": "^8.0.0"
+    "@trunkio/launcher": "^1.3.4"
   },
   "overrides": {
     "tar": "^7.5.8"

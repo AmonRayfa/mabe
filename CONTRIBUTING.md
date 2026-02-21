@@ -8,7 +8,6 @@ Here are the main directories and files in the project:
 
 ```plaintext
 .
-├── docs/
 ├── mabe_attr/
 │   ├── src/
 │   │   └── lib.rs
@@ -28,7 +27,7 @@ Here are the main directories and files in the project:
 └── package.json
 ```
 
-The project is organized as a Rust workspace centered around `src/`, which serves as the primary library entry point and re-exports functionality from the internal macro crates (and the [`anyhow`](https://docs.rs/anyhow/latest/anyhow/) crate). The `mabe_attr` directory contains the logic for the opaque `#[mabe::main]` attribute, while `mabe_derive` houses the implementation for the structured `#[derive(Error)]` macro. Additionally, the `package.json` file manages the development environment, containing configurations for linting and formatting via Trunk, as well as scripts for generating the API reference.
+The project is organized as a Rust workspace centered around `src/`, which serves as the primary library entry point and re-exports functionality from the internal macro crates (and the [`anyhow`](https://docs.rs/anyhow/latest/anyhow/) crate). The `mabe_attr` directory contains the logic for the opaque `#[mabe::main]` attribute, while `mabe_derive` houses the implementation for the structured `#[derive(Error)]` macro. Additionally, the `package.json` file configures the [Node](https://nodejs.org) environment required to run the [Trunk CLI](https://docs.trunk.io/code-quality/overview) metalinter.
 
 See the [API reference](https://mabe.readthedocs.io/en/stable/mabe/all.html) for a more detailed overview of the project structure.
 
@@ -118,8 +117,8 @@ cargo build --all-features                                  # Builds the project
 You can build the documentation using the following command:
 
 ```sh
-npm run doc                                                 # Builds the documentation at `docs/dist/`.
-npm run doc:open                                            # Builds the documentation and opens it in the browser.
+cargo doc --workspace --no-deps                             # Builds the documentation at `target/doc/`.
+cargo doc --workspace --no-deps --open                      # Builds the documentation and opens it in the browser.
 ```
 
 ## License

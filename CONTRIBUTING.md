@@ -1,6 +1,6 @@
 # Contribution Guide
 
-This file is primarily intended for developers who wish to fork the project and potentially contribute to it. This project adheres to the [Koseka Standard](https://koseka.net/book/standard), which provides standardized versioning and contribution rules. So, make sure to read it first before contributing to the project in any way.
+This file is primarily intended for developers who wish to fork the project and potentially contribute to it. This project adheres to the [Koseka Standards](https://koseka.net/standards/), which provides standardized versioning and contribution rules. So, make sure to read it first before contributing to the project in any way.
 
 ## Project Structure
 

@@ -19,6 +19,8 @@ words:
     koseka,
     mabe,
     markdownlint,
+    metalinter,
+    metalinters,
     msvc,
     njsproj,
     nocapture,

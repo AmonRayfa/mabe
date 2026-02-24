@@ -26,10 +26,10 @@
 
 <h2><img height="20" alt="branches" src="./img/branches.svg">&nbsp;&nbsp;Branches</h2>
 
-| Branch | Status      | Description                    |
-| :----- | :---------- | :----------------------------- |
-| `v1`   | **Stable**  | The latest production release. |
-| `dev`  | **Nightly** | Active development branch.     |
+| Branch | Description                                                     |
+| :----- | :-------------------------------------------------------------- |
+| `v1`   | The latest production branch.                                   |
+| `dev`  | The development branch; regularly merged into `v1` when stable. |
 
 **Note for Contributors:** Please submit all feature requests and standard bug fixes to the **`dev`** branch.
 

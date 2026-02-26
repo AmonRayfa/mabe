@@ -93,7 +93,7 @@ npm run fmt --all                                           # Formats all the fi
 
 ## Testing and Building the Project
 
-Currently, there are only tests for `mabe_derive`, but here are some general test commands:
+There are only tests for `mabe_derive` at the moment, here are some useful commands:
 
 ```sh
 cargo test --workspace                                      # Runs all the tests in the project.

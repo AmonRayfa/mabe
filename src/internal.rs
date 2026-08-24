@@ -3,8 +3,6 @@
 
 //! This module contains helper tools for the [`mabe_attr`](https://mabe.readthedocs.io/en/v1/mabe_attr/index.html) and [`mabe_derive`](https://mabe.readthedocs.io/en/v1/mabe_derive/index.html) dependency crates.
 
-use term_size;
-
 // [X] Header
 #[cfg(feature = "colorize")]
 pub const X: &str = "\x1b[34m[\x1b[0m\x1b[31mX\x1b[0m\x1b[34m]\x1b[0m";
@@ -30,10 +28,10 @@ pub const PIPE: &str = " │  ";
 
 /// Splits text into lines based on the terminal's width, and preserves the existing `\n`.
 pub fn wrap(text: String) -> Vec<String> {
-    let width = match term_size::dimensions() {
+    let width = match terminal_size::terminal_size() {
         // Retrieves the width of the terminal at runtime.
-        Some((w, _)) => w.saturating_sub(5), // safety check against very small terminals
-        None => 75,                          // default fallback
+        Some((terminal_size::Width(w), _)) => (w as usize).saturating_sub(5), // safety check against very small terminals
+        None => 75,                                                           // default fallback
     };
 
     let mut lines = Vec::new();

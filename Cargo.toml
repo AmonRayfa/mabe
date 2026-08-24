@@ -33,13 +33,13 @@ anyhow = "1.0"
 proc-macro2 = "1.0"
 quote = "1.0"
 syn = { version = "2.0", features = ["full", "extra-traits"] }
-term_size = "0.3"
+terminal_size = "0.4"
 
 [dependencies]
 anyhow = { workspace = true }
 mabe_attr = { path = "mabe_attr" }
 mabe_derive = { path = "mabe_derive", optional = true }
-term_size = { workspace = true }
+terminal_size = { workspace = true }
 
 [features]
 default = ["colorize"]

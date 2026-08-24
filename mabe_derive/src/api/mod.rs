@@ -13,9 +13,19 @@ use crate::utils::debug::log_macro_output;
 
 /// The core function that generates the raw implementations (i.e. a
 /// [`TokenStream`](https://doc.rust-lang.org/proc_macro/struct.TokenStream.html)) for the
-/// [`Mabe`](https://mabe.readthedocs.io/en/latest/generated/mabe/derive.Mabe.html) derive macro.
+/// [`Error`](https://mabe.readthedocs.io/en/stable/mabe_derive/derive.Error.html) derive macro. Invalid inputs are reported as
+/// spanned compile errors instead of panics, so they read like native compiler diagnostics and point at the offending item.
 pub(super) fn mabe(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
+
+    match expand(&input) {
+        Ok(implementations) => TokenStream::from(implementations),
+        Err(error) => TokenStream::from(error.to_compile_error()),
+    }
+}
+
+/// The fallible expansion logic behind the [`mabe`] entry point.
+fn expand(input: &DeriveInput) -> syn::Result<proc_macro2::TokenStream> {
     let enum_ident = &input.ident;
 
     let mut debug_match_arms = Vec::<proc_macro2::TokenStream>::new();
@@ -23,7 +33,7 @@ pub(super) fn mabe(input: TokenStream) -> TokenStream {
 
     if let Data::Enum(enum_data) = &input.data {
         if enum_data.variants.is_empty() {
-            panic!("{}", Error::EmptyEnum);
+            return Err(syn::Error::new_spanned(enum_ident, Error::EmptyEnum));
         }
 
         // Iterates over all the variants of the enum to generate the appropriate match arms for each of them.
@@ -31,7 +41,7 @@ pub(super) fn mabe(input: TokenStream) -> TokenStream {
             let variant_ident = &variant.ident;
 
             let mut debug_msg = format!("{}::{}", enum_ident, variant_ident);
-            let (error_msg, error_args) = format_msg(get_msg("error", variant));
+            let (error_msg, error_args) = format_msg(get_msg("error", variant)?);
 
             // Generates the match arms for the variant based on the type of fields it contains.
             match &variant.fields {
@@ -53,7 +63,7 @@ pub(super) fn mabe(input: TokenStream) -> TokenStream {
 
                     for (i, f) in fields.iter().enumerate() {
                         if !error_args.contains(f) {
-                            panic!("{}", Error::UnusedVariantField(variant_ident, f));
+                            return Err(syn::Error::new_spanned(variant_ident, Error::UnusedVariantField(variant_ident, f)));
                         }
 
                         if i == fields.len() - 1 {
@@ -76,22 +86,23 @@ pub(super) fn mabe(input: TokenStream) -> TokenStream {
                         Self::#variant_ident(#(#error_pattern_bindings),*) => format!(#error_msg, #(#error_keyword_args),*),
                     });
                 }
-                Fields::Named(fields) => {
-                    let fields = fields
-                        .named
-                        .iter()
-                        .map(|f| {
-                            f.ident
-                                .clone()
-                                .unwrap_or_else(|| panic!("{}", Error::IdentRetrievalFailed(variant_ident)))
-                                .to_string()
-                        })
-                        .collect::<Vec<String>>();
+                Fields::Named(named_fields) => {
+                    let mut fields = Vec::<String>::new();
+
+                    for f in &named_fields.named {
+                        match &f.ident {
+                            Some(field_ident) => fields.push(field_ident.to_string()),
+                            None => {
+                                return Err(syn::Error::new_spanned(variant_ident, Error::IdentRetrievalFailed(variant_ident)));
+                            }
+                        }
+                    }
+
                     debug_msg.push_str(" {{ ");
 
                     for (i, f) in fields.iter().enumerate() {
                         if !error_args.contains(f) {
-                            panic!("{}", Error::UnusedVariantField(variant_ident, f));
+                            return Err(syn::Error::new_spanned(variant_ident, Error::UnusedVariantField(variant_ident, f)));
                         }
 
                         if i == fields.len() - 1 {
@@ -117,7 +128,7 @@ pub(super) fn mabe(input: TokenStream) -> TokenStream {
             }
         }
     } else {
-        panic!("{}", Error::NotAnEnum);
+        return Err(syn::Error::new_spanned(enum_ident, Error::NotAnEnum));
     }
 
     let write_debug = quote! { write!(f, "{}", self.debug()) };
@@ -148,5 +159,5 @@ pub(super) fn mabe(input: TokenStream) -> TokenStream {
     #[cfg(debug_assertions)]
     log_macro_output(&implementations, "./mabe_output.log");
 
-    TokenStream::from(implementations)
+    Ok(implementations)
 }

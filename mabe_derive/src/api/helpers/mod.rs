@@ -8,67 +8,64 @@ use proc_macro2::{Span, TokenStream};
 use quote::quote;
 use syn::{Expr, Ident, Lit, Token, Variant, punctuated::Punctuated};
 
-/// A tool that returns the message of the attribute of a variant. The function will panic in the following cases: if the
-/// `error` attribute is not found, if the `error` attribute doesn't have exactly one argument, if the argument of the `error`
-/// attribute is not a string literal, or if the `error` attribute is used more than once on the same variant.
-pub(super) fn get_msg<A: ToString>(attribute: A, variant: &Variant) -> String {
+/// A tool that returns the message of the attribute of a variant. The function will return a spanned [`syn::Error`] in the
+/// following cases: if the `error` attribute is not found, if the `error` attribute doesn't have exactly one argument, if the
+/// argument of the `error` attribute is not a string literal, or if the `error` attribute is used more than once on the same
+/// variant.
+pub(super) fn get_msg<A: ToString>(attribute: A, variant: &Variant) -> syn::Result<String> {
     let attribute = attribute.to_string();
 
     if attribute != "error" {
-        panic!("{}", Error::InvalidAttr(&attribute));
+        return Err(syn::Error::new_spanned(&variant.ident, Error::InvalidAttr(&attribute)));
     }
 
-    let filtered_attrs = variant
-        .attrs
-        .iter()
-        .filter_map(|attr| {
-            // SYN 2.0 CHANGE:
-            // 1. Check if the attribute name matches.
-            if !attr.path().is_ident(&attribute) {
-                return None;
-            }
+    let mut msgs = Vec::<String>::new();
 
-            // 2. Parse the content inside the parentheses.
-            //    We parse it as a comma-separated list of expressions to Validate the count.
-            //    (e.g., #[error("A", "B")] would return 2 items).
-            let args_parser = Punctuated::<Expr, Token![,]>::parse_terminated;
+    for attr in &variant.attrs {
+        // 1. Check if the attribute name matches.
+        if !attr.path().is_ident(&attribute) {
+            continue;
+        }
 
-            let args = match attr.parse_args_with(args_parser) {
-                Ok(args) => args,
-                Err(_) => panic!("{}", Error::AttrParsingFailed(&variant.ident)),
-            };
+        // 2. Parse the content inside the parentheses.
+        //    We parse it as a comma-separated list of expressions to validate the count.
+        //    (e.g., #[error("A", "B")] would return 2 items).
+        let args_parser = Punctuated::<Expr, Token![,]>::parse_terminated;
 
-            // 3. Validation Logic (Preserving your exact Error types)
-            if args.len() != 1 {
-                panic!("{}", Error::UnexpectedAttrArgs(&variant.ident, args.len()));
-            }
+        let args = match attr.parse_args_with(args_parser) {
+            Ok(args) => args,
+            Err(_) => return Err(syn::Error::new_spanned(attr, Error::AttrParsingFailed(&variant.ident))),
+        };
 
-            // 4. Extract the string literal
-            let msg = match &args[0] {
-                Expr::Lit(expr_lit) => match &expr_lit.lit {
-                    Lit::Str(lit_str) => lit_str.value(),
-                    _ => panic!("{}", Error::UnsupportedAttrArg(&variant.ident)),
-                },
-                _ => panic!("{}", Error::UnsupportedAttrArg(&variant.ident)),
-            };
+        // 3. Validate the argument count.
+        if args.len() != 1 {
+            return Err(syn::Error::new_spanned(attr, Error::UnexpectedAttrArgs(&variant.ident, args.len())));
+        }
 
-            if msg.is_empty() {
-                panic!("{}", Error::EmptyAttr(&variant.ident));
-            }
+        // 4. Extract the string literal.
+        let msg = match &args[0] {
+            Expr::Lit(expr_lit) => match &expr_lit.lit {
+                Lit::Str(lit_str) => lit_str.value(),
+                _ => return Err(syn::Error::new_spanned(&args[0], Error::UnsupportedAttrArg(&variant.ident))),
+            },
+            _ => return Err(syn::Error::new_spanned(&args[0], Error::UnsupportedAttrArg(&variant.ident))),
+        };
 
-            Some(msg)
-        })
-        .collect::<Vec<String>>();
+        if msg.is_empty() {
+            return Err(syn::Error::new_spanned(attr, Error::EmptyAttr(&variant.ident)));
+        }
 
-    if filtered_attrs.len() > 1 {
-        panic!("{}", Error::ExcessAttr(&variant.ident));
+        msgs.push(msg);
     }
 
-    if filtered_attrs.is_empty() && attribute == "error" {
-        panic!("{}", Error::ErrAttrNotFound(&variant.ident));
+    if msgs.len() > 1 {
+        return Err(syn::Error::new_spanned(&variant.ident, Error::ExcessAttr(&variant.ident)));
     }
 
-    if filtered_attrs.is_empty() { String::new() } else { filtered_attrs[0].clone() }
+    match msgs.into_iter().next() {
+        Some(msg) => Ok(msg),
+        None => Err(syn::Error::new_spanned(&variant.ident, Error::ErrAttrNotFound(&variant.ident))),
+    }
 }
 
 /// A tool that returns a tuple containing the formatted message and the extracted arguments as `String` and `Vec<String>` types

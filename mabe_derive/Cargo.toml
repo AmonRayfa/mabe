@@ -7,6 +7,9 @@ publish = false
 proc-macro = true
 
 [[test]]
+name = "non_ascii"
+
+[[test]]
 name = "unit_variants"
 
 [[test]]

@@ -40,18 +40,20 @@ pub fn wrap(text: String) -> Vec<String> {
 
     for raw_line in text.lines() {
         let mut current_line = String::new();
+        let mut current_len = 0; // The width is measured in characters, not bytes, to handle non-ASCII text correctly.
 
         for word in raw_line.split_whitespace() {
             // Calculates the required length: current + word + space (if not start of line)
             let space_needed = if current_line.is_empty() { 0 } else { 1 };
-            let word_len = word.len();
+            let word_len = word.chars().count();
 
             // If adding this word exceeds width...
-            if current_line.len() + space_needed + word_len > width {
+            if current_len + space_needed + word_len > width {
                 // ...push the current line (if it has content)
                 if !current_line.is_empty() {
                     lines.push(current_line);
                     current_line = String::new();
+                    current_len = 0;
                 }
                 // Note: If 'word' is longer than 'width' all by itself,
                 // it will just start the new current_line and overflow.
@@ -59,8 +61,10 @@ pub fn wrap(text: String) -> Vec<String> {
 
             if !current_line.is_empty() {
                 current_line.push(' ');
+                current_len += 1;
             }
             current_line.push_str(word);
+            current_len += word_len;
         }
 
         // Pushes the last segment

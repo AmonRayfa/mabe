@@ -198,6 +198,12 @@ mod tests {
         let (formatted_msg5, extracted_args_msg5) = format_msg(msg5);
         assert_eq!(formatted_msg5, "The placeholders are: {placeholder0} and z.");
         assert_eq!(extracted_args_msg5, vec!["x}}, {y".to_string()]);
+
+        // Example 6: Non-ASCII characters around the curly braces.
+        let msg6 = "Étape {x} — champs {{y}} et {z}.".to_string();
+        let (formatted_msg6, extracted_args_msg6) = format_msg(msg6);
+        assert_eq!(formatted_msg6, "Étape {placeholder0} — champs {{y}} et {placeholder1}.");
+        assert_eq!(extracted_args_msg6, vec!["x".to_string(), "z".to_string()]);
     }
 
     #[test]

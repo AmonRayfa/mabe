@@ -1,6 +1,6 @@
 suggestionsTimeout: 5000 # Suggestions can sometimes take longer on CI machines, leading to inconsistent results.
 version: "0.2"
-language: "en"
+language: en
 ignorePaths:
   - img/
 words:
@@ -9,7 +9,6 @@ words:
     androideabi,
     armv,
     clippy,
-    consec,
     dunder,
     emscripten,
     getline,

@@ -1,6 +1,6 @@
 # Contribution Guide
 
-This file is primarily intended for developers who wish to fork the project and potentially contribute to it. This project adheres to the [Koseka Standards](https://koseka.net/standards/), which provides standardized versioning and contribution rules. So, make sure to read it first before contributing to the project in any way.
+This file is primarily intended for developers who wish to fork the project and potentially contribute to it. This project uses [Phased Versioning](https://phased-versioning.koseka.net), which defines the versioning, branching, and release rules, and commit messages follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification. So, make sure to read both first before contributing to the project in any way.
 
 ## Project Structure
 
@@ -27,7 +27,9 @@ Here are the main directories and files in the project:
 └── package.json
 ```
 
-The project is organized as a Rust workspace centered around `src/`, which serves as the primary library entry point and re-exports functionality from the internal macro crates (and the [`anyhow`](https://docs.rs/anyhow/latest/anyhow/) crate). The `mabe_attr` directory contains the logic for the opaque `#[mabe::main]` attribute, while `mabe_derive` houses the implementation for the structured `#[derive(Error)]` macro. Additionally, the `package.json` file configures the [Node](https://nodejs.org) environment required to run the [Trunk CLI](https://docs.trunk.io/code-quality/overview) metalinter.
+The project is organized as a Rust workspace centered around `src/`, which serves as the primary library entry point and re-exports functionality from the internal macro crates (and the [`anyhow`](https://docs.rs/anyhow/latest/anyhow/) crate). The `mabe_attr` directory contains the logic for the opaque `#[mabe::main]` attribute, while `mabe_derive` houses the implementation for the structured `#[derive(Error)]` macro.
+
+Additionally, the `package.json` file configures the [Node](https://nodejs.org) environment required to run the [Trunk CLI](https://docs.trunk.io/code-quality/overview) metalinter.
 
 See the [API reference](https://mabe.readthedocs.io/en/stable/mabe/all.html) for a more detailed overview of the project structure.
 
@@ -81,14 +83,14 @@ You can manually run the linters and formatters using the following commands:
 
 ```sh
 npm run check                                               # Runs linters and formatters on all the changed files.
-npm run check --all                                         # Runs linters and formatters on all the files in the repository.
+npm run check -- --all                                      # Runs linters and formatters on all the files in the repository.
 ```
 
 You can manually format the code using the following commands:
 
 ```sh
 npm run fmt                                                 # Formats all the changed files.
-npm run fmt --all                                           # Formats all the files in the repository.
+npm run fmt -- --all                                        # Formats all the files in the repository.
 ```
 
 ## Testing and Building the Project
@@ -114,7 +116,7 @@ cargo build --all-features                                  # Builds the project
 
 ## Building the Documentation
 
-You can build the documentation using the following command:
+You can build the documentation using the following commands:
 
 ```sh
 cargo doc --workspace --no-deps                             # Builds the documentation at `target/doc/`.

@@ -13,7 +13,8 @@ mod utils;
 /// the error message each variant of the enum. The macro also automatically generates implementations for the
 /// [`Debug`](https://doc.rust-lang.org/std/fmt/trait.Debug.html),
 /// [`Display`](https://doc.rust-lang.org/std/fmt/trait.Display.html), and
-/// [`Error`](https://doc.rust-lang.org/std/error/trait.Error.html) traits.
+/// [`Error`](https://doc.rust-lang.org/std/error/trait.Error.html) traits. Note that the macro also generates public `debug()`
+/// and `error()` methods on the enum, so these method names are reserved and cannot be defined manually on the same enum.
 #[proc_macro_derive(Error, attributes(error))]
 pub fn mabe_derive_macro(input: TokenStream) -> TokenStream {
     mabe(input)

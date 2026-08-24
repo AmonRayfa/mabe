@@ -83,14 +83,14 @@ You can manually run the linters and formatters using the following commands:
 
 ```sh
 npm run check                                               # Runs linters and formatters on all the changed files.
-npm run check --all                                         # Runs linters and formatters on all the files in the repository.
+npm run check -- --all                                      # Runs linters and formatters on all the files in the repository.
 ```
 
 You can manually format the code using the following commands:
 
 ```sh
 npm run fmt                                                 # Formats all the changed files.
-npm run fmt --all                                           # Formats all the files in the repository.
+npm run fmt -- --all                                        # Formats all the files in the repository.
 ```
 
 ## Testing and Building the Project

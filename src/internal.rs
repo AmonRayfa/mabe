@@ -1,7 +1,7 @@
 // Copyright 2026 Amon Rayfa.
 // SPDX-License-Identifier: Apache-2.0.
 
-//! This module contains helper tools for the [`mabe_attr`](https://mabe.readthedocs.io/en/v1/mabe_attr/index.html) and [`mabe_derive`](https://mabe.readthedocs.io/en/v1/mabe_derive/index.html) dependency crates.
+//! This module contains helper tools for the [`mabe_attr`](https://mabe.readthedocs.io/en/stable/mabe_attr/index.html) and [`mabe_derive`](https://mabe.readthedocs.io/en/stable/mabe_derive/index.html) dependency crates.
 
 // [X] Header
 #[cfg(feature = "colorize")]

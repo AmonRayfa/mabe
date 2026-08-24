@@ -6,7 +6,8 @@ use quote::quote;
 use syn::{ItemFn, parse_macro_input};
 
 /// The attribute macro used on the entry point of your app to format error chains into a debug-friendly tree structure in the
-/// terminal.
+/// terminal. The attribute only supports synchronous entry points, so it cannot be used on an `async fn main` (e.g. with the
+/// `tokio::main` or `async-std::main` attributes).
 #[proc_macro_attribute]
 pub fn main(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let mut input_fn = parse_macro_input!(item as ItemFn);
